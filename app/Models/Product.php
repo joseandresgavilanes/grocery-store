@@ -8,8 +8,6 @@ class Product extends Model
 {
 
 
-    use SoftDeletes;
-
     protected $fillable = [
         'category_id',
         'name',

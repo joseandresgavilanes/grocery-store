@@ -21,6 +21,7 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="'Academics'" class="grid">
                     <flux:navlist.item icon="academic-cap" :href="route('courses.showcase')" :current="request()->routeIs('courses.showcase')" wire:navigate>Courses</flux:navlist.item>
+                    <flux:navlist.item icon="academic-cap" :href="route('products.index')" :current="request()->routeIs('products.index')" wire:navigate>Products</flux:navlist.item>
                     <flux:navlist.group heading="Curricula" expandable :expanded="false">
                      
                     </flux:navlist.group>

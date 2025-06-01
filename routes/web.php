@@ -44,7 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Categorías y productos
     Route::resource('categories', CategoryController::class);
-    Route::resource('products',   ProductController::class);
+//     Route::resource('products',   ProductController::class);
 
     // Pedidos de clientes e ítems
     Route::resource('orders',      OrderController::class);
@@ -67,6 +67,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('courses/showcase', [CourseController::class, 'showCase'])->name('courses.showcase');
 
 Route::resource('courses', CourseController::class);
+
+Route::resource('products', ProductController::class);
 
 Route::resource('disciplines', DisciplineController::class);
 
