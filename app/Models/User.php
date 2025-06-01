@@ -59,6 +59,15 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function getImageUrlAttribute()
+    {
+        if (Storage::disk('public')->exists("users/$this->photo")) {
+            return asset("storage/users/$this->photo");
+        } else {
+            return asset("storage/users/anonymous.png");
+        }
+    }
+
     /**
      * Get the user's initials
      */

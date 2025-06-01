@@ -32,6 +32,14 @@ class Product extends Model
         'custom'            => 'array',
     ];
 
+    public function getImageUrlAttribute(): string
+    {
+        if ($this->photo && \Storage::disk('public')->exists('products/' . $this->photo)) {
+            return asset('storage/products/' . $this->photo);
+        }
+    
+        return asset('storage/products/product_no_image.png');
+    }
 
     // RELACIONES
     public function category()

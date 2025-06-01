@@ -29,7 +29,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // CRUD de usuarios y tarjetas
     Route::resource('users',    UserController::class);
-    Route::resource('cards',    CardController::class);
 
     // Ajuste de tarifa de membresía (único recurso)
     Route::get('settings/membership', [SettingController::class, 'edit'])
@@ -69,6 +68,8 @@ Route::get('courses/showcase', [CourseController::class, 'showCase'])->name('cou
 Route::resource('courses', CourseController::class);
 
 Route::resource('products', ProductController::class);
+
+Route::resource('cards',    CardController::class);
 
 Route::resource('disciplines', DisciplineController::class);
 
