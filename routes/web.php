@@ -17,15 +17,19 @@ use App\Http\Controllers\TransactionController;
 // Ruta pública de bienvenida
 Route::view('/', 'home')->name('home');
 
+
+Route::middleware(['auth', 'notBlocked'])->group(function () {
+     Route::redirect('settings', 'settings/profile');
+
+     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
+     Volt::route('settings/password', 'settings.password')->name('settings.password');
+     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
+ });
+
+
 // Dashboard protegido
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
-
-    // Perfil / settings de usuario con Livewire Volt
-    Route::redirect('settings', 'settings/profile');
-    Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
-    Volt::route('settings/password', 'settings.password')->name('settings.password');
-    Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 
     // CRUD de usuarios y tarjetas
     Route::resource('users',    UserController::class);

@@ -56,4 +56,12 @@ class Product extends Model
     {
         return $this->hasMany(SupplyOrderItem::class);
     }
+
+    public function getDiscountedPriceAttribute(): ?float
+    {
+        if ($this->discount && $this->discount_min_qty) {
+            return round($this->price * (1 - $this->discount), 2);
+        }
+        return null;
+    }
 }

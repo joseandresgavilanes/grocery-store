@@ -17,6 +17,12 @@ new class extends Component {
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->nif = Auth::user()->nif;
+        $this->photo = Auth::user()->photo;
+        $this->default_delivery_address = Auth::user()->default_delivery_address;
+        $this->default_payment_type = Auth::user()->default_payment_type;
+        $this->default_payment_reference = Auth::user()->default_payment_reference;
+
     }
 
     /**
@@ -24,7 +30,7 @@ new class extends Component {
      */
     public function updateProfileInformation(): void
     {
-        $user = Auth::user();
+        $user = Auth::user();44
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -37,6 +43,11 @@ new class extends Component {
                 'max:255',
                 Rule::unique(User::class)->ignore($user->id)
             ],
+
+            'nif' = 'nullable|string|digits:9'
+            'default_delivery_address' = 'nullable|string|max:255'
+            'default_payment_type' = 'nullable|in:PayPal,MB_WAY|Visa'
+
         ]);
 
         $user->fill($validated);
