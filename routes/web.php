@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\CardController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShippingCostController;
 use App\Http\Controllers\CategoryController;
@@ -33,7 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Ajuste de tarifa de membresía (único recurso)
     Route::get('settings/membership', [SettingController::class, 'edit'])
          ->name('settings.membership.edit');
-         
+
     Route::put('settings/membership', [SettingController::class, 'update'])
          ->name('settings.membership.update');
 
@@ -74,5 +74,7 @@ Route::resource('cards',    CardController::class);
 Route::resource('disciplines', DisciplineController::class);
 
 Route::resource('departments', DepartmentController::class);
+
+Route::get('cart', [CartController::class, 'show'])->name('cart.show');
 
 require __DIR__.'/auth.php';

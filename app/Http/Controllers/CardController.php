@@ -12,8 +12,7 @@ class CardController extends Controller
 {
     public function index(): View
     {
-        $cards = Card::paginate(20);
-        return view('cards.index', compact('cards'));
+        return view('cards.index');
     }
 
     public function create(): View

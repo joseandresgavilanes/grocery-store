@@ -22,9 +22,9 @@
                 <flux:navlist.group :heading="'Academics'" class="grid">
                     <flux:navlist.item icon="academic-cap" :href="route('courses.showcase')" :current="request()->routeIs('courses.showcase')" wire:navigate>Courses</flux:navlist.item>
                     <flux:navlist.item icon="academic-cap" :href="route('products.index')" :current="request()->routeIs('products.index')" wire:navigate>Products</flux:navlist.item>
-                    <flux:navlist.item icon="academic-cap" :href="route('cards.index')" :current="request()->routeIs('cards.index')" wire:navigate>Carrito</flux:navlist.item>
+                    <flux:navlist.item icon="academic-cap" :href="route('cart.show')" :current="request()->routeIs('cart.show')" wire:navigate>Carrito</flux:navlist.item>
                     <flux:navlist.group heading="Curricula" expandable :expanded="false">
-                     
+
                     </flux:navlist.group>
                 </flux:navlist.group>
             </flux:navlist>
@@ -101,10 +101,10 @@
                         <flux:navlist.item icon="key" :href="route('login')" :current="request()->routeIs('login')" wire:navigate>Login</flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
-            @endauth    
+            @endauth
         </flux:sidebar>
 
-        <!-- Mobile User Menu -->        
+        <!-- Mobile User Menu -->
         <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
