@@ -18,39 +18,51 @@ class CartController extends Controller
         return view('cart.show', compact('cart'));
     }
 
-   /*public function addToCart(Request $request, Product $product)
+    public function addToCart(Request $request, Product $product)
     {
+        // 1. Intentamos leer de sesión la clave "cart". Si no existe, $cart queda en null.
         $cart = session('cart', null);
-
-        if (!$cart) {
+    
+        // 2. Si $cart es null, significa que aún no hay nada en el carrito.
+        //    Entonces creamos una Collection con este primer producto y la guardamos en sesión.
+        if (! $cart) {
+            // collect([$product]) crea una colección que contiene el modelo $product
             $cart = collect([$product]);
             $request->session()->put('cart', $cart);
-        } else {
+        }
+        else {
+            // 3. Si ya existe una Collection en sesión, comprobamos si el producto ya está
+            //    usando firstWhere('id', $product->id). Si lo encuentra, devolvemos advertencia.
             if ($cart->firstWhere('id', $product->id)) {
                 $alertType = 'warning';
-                $url = route('product.show', ['product' => $product]);
-                $htmlMessage = "Product <a href='$url'>#{$product->id}
+                $htmlMessage = "Product <a href='google.com'>#{$product->id}
                     <strong>\"{$product->name}\"</strong></a> was not added to the cart
                     because it is already included in the cart!";
+    
                 return back()
                     ->with('alert-msg', $htmlMessage)
                     ->with('alert-type', $alertType);
-            } else {
+            }
+            else {
+                // 4. Si NO está en la Collection, lo agregamos con push() y volvemos a 
+                //    sobrescribir la Collection en sesión.
                 $cart->push($product);
                 $request->session()->put('cart', $cart);
             }
         }
-
+    
+        // 5. Si el flujo llega aquí, quiere decir que se agregó el producto correctamente.
+        //    Preparamos el mensaje de éxito y devolvemos con back() (para la misma página).
         $alertType = 'success';
-        $url = route('product.show', ['product' => $product]);
-        $htmlMessage = "Product <a href='$url'>#{$product->id}
+        $htmlMessage = "Product <a href='googlr.com'>#{$product->id}
             <strong>\"{$product->name}\"</strong></a> was added to the cart.";
+    
         return back()
             ->with('alert-msg', $htmlMessage)
             ->with('alert-type', $alertType);
     }
 
-
+ /*
     public function removeFromCart(Request $request, Product $product): RedirectResponse
     {
         $url = route('product.show', ['product' => $product]);

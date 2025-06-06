@@ -82,6 +82,7 @@ Route::resource('disciplines', DisciplineController::class);
 Route::resource('departments', DepartmentController::class);
 
 Route::get('cart', [CartController::class, 'show'])->name('cart.show');
+Route::post('cart/{product}', [CartController::class, 'addToCart'])->name('cart.add');
 
 
 require __DIR__.'/auth.php';
