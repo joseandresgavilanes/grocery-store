@@ -13,19 +13,25 @@ use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\SupplyOrderController;
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\CartController;
+
 
 // Ruta pública de bienvenida
 Route::view('/', 'home')->name('home');
 
+
+Route::middleware(['auth', 'notBlocked'])->group(function () {
+     Route::redirect('settings', 'settings/profile');
+
+     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
+     Volt::route('settings/password', 'settings.password')->name('settings.password');
+     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
+ });
+
+
 // Dashboard protegido
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
-
-    // Perfil / settings de usuario con Livewire Volt
-    Route::redirect('settings', 'settings/profile');
-    Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
-    Volt::route('settings/password', 'settings.password')->name('settings.password');
-    Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 
     // CRUD de usuarios y tarjetas
     Route::resource('users',    UserController::class);
@@ -76,5 +82,6 @@ Route::resource('disciplines', DisciplineController::class);
 Route::resource('departments', DepartmentController::class);
 
 Route::get('cart', [CartController::class, 'show'])->name('cart.show');
+
 
 require __DIR__.'/auth.php';
