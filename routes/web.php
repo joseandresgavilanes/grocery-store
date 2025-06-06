@@ -13,6 +13,8 @@ use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\SupplyOrderController;
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\CartController;
+
 
 // Ruta pública de bienvenida
 Route::view('/', 'home')->name('home');
@@ -78,5 +80,8 @@ Route::resource('cards',    CardController::class);
 Route::resource('disciplines', DisciplineController::class);
 
 Route::resource('departments', DepartmentController::class);
+
+Route::get('cart', [CartController::class, 'show'])->name('cart.show');
+
 
 require __DIR__.'/auth.php';
