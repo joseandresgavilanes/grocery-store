@@ -99,7 +99,10 @@
             @endif
 
             {{-- 7) Formulario “Añadir al carrito” (se queda al final, con margin-top auto para empujar hasta abajo) --}}
-            <form class="mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
+            <form 
+            action="{{ route('cart.add', ['product' => $product->id]) }}"
+            method="POST"
+            class="mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
                 @csrf
                 <div class="flex items-center space-x-2 mt-2">
                     {{-- Input de cantidad --}}
