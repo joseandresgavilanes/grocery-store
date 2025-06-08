@@ -35,16 +35,20 @@
     @auth
         {{-- Pedidos: empleados y board solo ven pedidos pendientes --}}
         @if(in_array(auth()->user()->type, ['employee','board']))
-            <flux:navlist variant="outline">
-                <flux:navlist.group heading="Pedidos">
-                    <flux:navlist.item
-                        icon="academic-cap"
-                        :href="route('orders.pending')"
-                        :current="request()->routeIs('orders.pending')"
-                        wire:navigate
-                    >Pendientes</flux:navlist.item>
-                </flux:navlist.group>
-            </flux:navlist>
+        
+        @can('viewAnyPending', App\Models\Order::class)
+  <flux:navlist variant="outline">
+    <flux:navlist.group heading="Pedidos">
+      <flux:navlist.item
+        icon="academic-cap"
+        :href="route('orders.pending')"
+        :current="request()->routeIs('orders.pending')"
+        wire:navigate
+      >Pendientes</flux:navlist.item>
+    </flux:navlist.group>
+  </flux:navlist>
+@endcan
+
         @endif
 
         {{-- Inventario: empleados y board --}}

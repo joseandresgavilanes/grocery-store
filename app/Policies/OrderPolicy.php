@@ -1,5 +1,4 @@
 <?php
-// app/Policies/OrderPolicy.php
 
 namespace App\Policies;
 
@@ -9,29 +8,29 @@ use App\Models\Order;
 class OrderPolicy
 {
     /**
-     * Ver la lista de pendientes: employee o board.
+     * ¿Puede ver la lista de pedidos pendientes?
      */
-    public function pending(User $user): bool
+    public function viewAnyPending(User $user): bool
     {
-        return in_array($user->type, ['employee', 'board']);
+        return $user->isEmployee() || $user->isBoard();
     }
 
     /**
-     * Completar pedido: sólo employee y estado pending.
+     * ¿Puede completar este pedido?
      */
     public function complete(User $user, Order $order): bool
     {
-        return $user->type === 'employee'
-            && $order->status === 'pending';
+        return $user->isEmployee()
+            && $order->status === 'pending'
+            && $order->items->every(fn($item) => $item->product->stock >= $item->quantity);
     }
 
     /**
-     * Cancelar pedido: sólo board y estado pending.
+     * ¿Puede cancelar este pedido?
      */
     public function cancel(User $user, Order $order): bool
     {
-        return $user->type === 'board'
+        return $user->isBoard()
             && $order->status === 'pending';
     }
-
 }

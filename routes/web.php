@@ -52,6 +52,7 @@ Route::middleware(['auth','can:member'])->group(function(){
      Route::resource('categories',CategoryController::class);
      Route::resource('products',ProductController::class);
      Route::resource('settings',SettingsController::class)->only(['index','update']);
+     Route::post('orders/{order}/cancel',[OrderController::class,'cancel'])->name('orders.cancel');
      Route::post('settings/shipping',[ShippingSettingsController::class,'update'])->name('settings.shipping.update');
      Route::get('stats/global',[StatsController::class,'global'])->name('stats.global');
    });

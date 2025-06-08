@@ -1,7 +1,5 @@
 <x-layouts.main-content title="Pedidos pendientes">
-  <div class="mb-4">
-    <a href="{{ route('dashboard') }}" class="btn-secondary">Volver al Dashboard</a>
-  </div>
+  
 
   <table class="w-full border-collapse border border-gray-200">
     <thead class="bg-gray-100">
@@ -49,8 +47,5 @@
       @endforelse
     </tbody>
   </table>
-
-  <div class="mt-4">
-    {{ $orders->links() }}
-  </div>
+  
 </x-layouts.main-content>
