@@ -7,69 +7,95 @@ use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\OrderFormRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class OrderController extends Controller
 {
-    public function index(): View
+
+    use AuthorizesRequests;
+
+    public function __construct()
     {
-        $orders = Order::paginate(20);
-        return view('orders.index', compact('orders'));
+        $this->authorizeResource(Order::class);
     }
 
-    public function create(): View
+
+    public function pending()
     {
-        return view('orders.create')->with('order', new Order());
+
+        $orders = Order::with('member')
+            ->where('status','pending')
+            ->paginate(20);
+
+        return view('orders.pending', compact('orders'));
     }
 
-    public function store(OrderFormRequest $request): RedirectResponse
+    /** 5.2. Completar (solo employee y con stock) */
+    public function complete(Order $order)
     {
-        $o = Order::create($request->validated());
-        $url = route('orders.show', ['order' => $o]);
-        $msg = "Pedido <a href='$url'><u>#{$o->id}</u></a> creado correctamente.";
-        return redirect()->route('orders.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
 
-    public function show(Order $order): View
-    {
-        return view('orders.show', compact('order'));
-    }
-
-    public function edit(Order $order): View
-    {
-        return view('orders.edit', compact('order'));
-    }
-
-    public function update(OrderFormRequest $request, Order $order): RedirectResponse
-    {
-        $order->update($request->validated());
-        $url = route('orders.show', ['order' => $order]);
-        $msg = "Pedido <a href='$url'><u>#{$order->id}</u></a> actualizado correctamente.";
-        return redirect()->route('orders.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
-
-    public function destroy(Order $order): RedirectResponse
-    {
-        try {
-            if ($order->items()->count() === 0) {
-                $order->delete();
-                $type = 'success';
-                $msg  = "Pedido #{$order->id} eliminado correctamente.";
-            } else {
-                $type = 'warning';
-                $cnt  = $order->items()->count();
-                $msg  = "El pedido #{$order->id} no puede borrarse porque tiene $cnt ítems.";
+        foreach ($order->items as $item) {
+            if ($item->quantity > $item->product->stock) {
+                return back()
+                    ->with('alert-type','warning')
+                    ->with('alert-msg',"No hay stock suficiente de “{$item->product->name}”");
             }
-        } catch (\Exception $e) {
-            $type = 'danger';
-            $msg  = "Error al eliminar el pedido #{$order->id}.";
         }
 
-        return redirect()->back()
-                         ->with('alert-type', $type)
-                         ->with('alert-msg', $msg);
+        DB::transaction(function() use ($order) {
+            $order->update(['status'=>'completed']);
+
+            // PDF + guardar ruta
+            $pdf  = PDF::loadView('orders.receipt', compact('order'));
+            $path = "receipts/order_{$order->id}.pdf";
+            \Storage::disk('public')->put($path, $pdf->output());
+            $order->update(['pdf_receipt'=>$path]);
+
+            // email
+            Mail::to($order->member->email)
+                ->send(new OrderCompletedMail($order));
+
+            // restar stock
+            foreach ($order->items as $item) {
+                $item->product->decrement('stock',$item->quantity);
+            }
+        });
+
+        return redirect()
+            ->route('orders.pending')
+            ->with('alert-type','success')
+            ->with('alert-msg',"Pedido #{$order->id} completado");
     }
+
+    /** 5.3. Cancelar (solo board) */
+    public function cancel(Request $request, Order $order)
+    {
+
+        abort_if($order->status!=='pending', 400, 'Solo pendientes pueden cancelarse');
+
+        DB::transaction(function() use($order,$request) {
+            $order->update([
+                'status'=>'canceled',
+                'cancel_reason'=>$request->input('reason'),
+            ]);
+
+            // reembolso virtual
+            $order->member->card->transactions()->create([
+                'type'        =>'credit',
+                'amount'      =>$order->total,
+                'date'        => now()->toDateString(),
+                'credit_type' =>'order_cancellation',
+                'order_id'    =>$order->id,
+            ]);
+
+            Mail::to($order->member->email)
+                ->send(new OrderCanceledMail($order));
+        });
+
+        return back()
+            ->with('alert-type','success')
+            ->with('alert-msg',"Pedido #{$order->id} cancelado y reembolsado");
+    }
+
+ 
 }

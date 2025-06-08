@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ItemOrder;
+use App\Models\ItemsOrder;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -12,18 +12,18 @@ class ItemOrderController extends Controller
 {
     public function index(): View
     {
-        $items = ItemOrder::paginate(20);
+        $items = ItemsOrder::paginate(20);
         return view('order_items.index', compact('items'));
     }
 
     public function create(): View
     {
-        return view('order_items.create')->with('orderItem', new ItemOrder());
+        return view('order_items.create')->with('orderItem', new ItemsOrder());
     }
 
     public function store(ItemOrderFormRequest $request): RedirectResponse
     {
-        $i = ItemOrder::create($request->validated());
+        $i = ItemsOrder::create($request->validated());
         $url = route('order_items.show', ['order_item' => $i]);
         $msg = "Ítem de pedido <a href='$url'><u>#{$i->id}</u></a> creado correctamente.";
         return redirect()->route('order_items.index')
@@ -31,17 +31,17 @@ class ItemOrderController extends Controller
                          ->with('alert-msg', $msg);
     }
 
-    public function show(ItemOrder $orderItem): View
+    public function show(ItemsOrder $orderItem): View
     {
         return view('order_items.show', compact('orderItem'));
     }
 
-    public function edit(ItemOrder $orderItem): View
+    public function edit(ItemsOrder $orderItem): View
     {
         return view('order_items.edit', compact('orderItem'));
     }
 
-    public function update(ItemOrderFormRequest $request, ItemOrder $orderItem): RedirectResponse
+    public function update(ItemOrderFormRequest $request, ItemsOrder $orderItem): RedirectResponse
     {
         $orderItem->update($request->validated());
         $url = route('order_items.show', ['order_item' => $orderItem]);
@@ -51,7 +51,7 @@ class ItemOrderController extends Controller
                          ->with('alert-msg', $msg);
     }
 
-    public function destroy(ItemOrder $orderItem): RedirectResponse
+    public function destroy(ItemsOrder $orderItem): RedirectResponse
     {
         try {
             $orderItem->delete();
