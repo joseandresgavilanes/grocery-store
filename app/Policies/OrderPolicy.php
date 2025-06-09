@@ -20,7 +20,7 @@ class OrderPolicy
      */
     public function complete(User $user, Order $order): bool
     {
-        return $user->isEmployee()
+        return ($user->isEmployee() || $user->isBoard())
             && $order->status === 'pending'
             && $order->items->every(fn($item) => $item->product->stock >= $item->quantity);
     }
