@@ -3,73 +3,76 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use Illuminate\View\View;
+use App\Services\CardService;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\OrderFormRequest;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderCompleted;
+use PDF;
+use App\Models\StockAdjustment;
 
 class OrderController extends Controller
 {
-    public function index(): View
+    public function pending()
     {
-        $orders = Order::paginate(20);
-        return view('orders.index', compact('orders'));
+        $this->authorize('viewAnyPending', Order::class);
+
+        $orders = Order::with('member')
+            ->where('status', 'pending')
+            ->orderBy('created_at')
+            ->get();
+
+        return view('orders.pending', compact('orders'));
     }
 
-    public function create(): View
+    public function complete(Order $order)
     {
-        return view('orders.create')->with('order', new Order());
-    }
+        $this->authorize('complete', $order);
 
-    public function store(OrderFormRequest $request): RedirectResponse
-    {
-        $o = Order::create($request->validated());
-        $url = route('orders.show', ['order' => $o]);
-        $msg = "Pedido <a href='$url'><u>#{$o->id}</u></a> creado correctamente.";
-        return redirect()->route('orders.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
+        // 1) Actualizar estado
+        $order->status === 'completed';
+        $order->save();
 
-    public function show(Order $order): View
-    {
-        return view('orders.show', compact('order'));
-    }
+        // 2) Generar PDF
+        $pdf = PDF::loadView('orders.receipt', compact('order'));
+        $path = "receipts/order-{$order->id}.pdf";
+        Storage::put("public/{$path}", $pdf->output());
 
-    public function edit(Order $order): View
-    {
-        return view('orders.edit', compact('order'));
-    }
+        // 3) Actualizar stock y registrar ajustes
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            $old = $product->stock;
+            $product->decrement('stock', $item->quantity);
 
-    public function update(OrderFormRequest $request, Order $order): RedirectResponse
-    {
-        $order->update($request->validated());
-        $url = route('orders.show', ['order' => $order]);
-        $msg = "Pedido <a href='$url'><u>#{$order->id}</u></a> actualizado correctamente.";
-        return redirect()->route('orders.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
-
-    public function destroy(Order $order): RedirectResponse
-    {
-        try {
-            if ($order->items()->count() === 0) {
-                $order->delete();
-                $type = 'success';
-                $msg  = "Pedido #{$order->id} eliminado correctamente.";
-            } else {
-                $type = 'warning';
-                $cnt  = $order->items()->count();
-                $msg  = "El pedido #{$order->id} no puede borrarse porque tiene $cnt ítems.";
-            }
-        } catch (\Exception $e) {
-            $type = 'danger';
-            $msg  = "Error al eliminar el pedido #{$order->id}.";
+            StockAdjustment::create([
+                'product_id' => $product->id,
+                'user_id'    => auth()->id(),
+                'old_qty'    => $old,
+                'new_qty'    => $product->stock,
+                'reason'     => "Pedido #{$order->id}"
+            ]);
         }
 
-        return redirect()->back()
-                         ->with('alert-type', $type)
-                         ->with('alert-msg', $msg);
+        // 4) Enviar email con recibo
+        Mail::to($order->member->email)
+            ->send(new OrderCompleted($order, $path));
+
+        return redirect()->route('orders.pending')
+                         ->with('success', "Pedido #{$order->id} marcado como completado.");
+    }
+
+    public function cancel(Order $order, CardService $card)
+    {
+        $this->authorize('cancel', $order);
+
+        // 1) Cambiar estado
+        $order->status = Order::STATUS_CANCELED;
+        $order->save();
+
+        // 2) Reembolsar
+        $card->refund($order->member->card, $order->total);
+
+        return redirect()->route('orders.pending')
+                         ->with('success', "Pedido #{$order->id} cancelado y reembolsado.");
     }
 }

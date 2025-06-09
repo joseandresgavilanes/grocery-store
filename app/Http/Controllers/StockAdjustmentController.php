@@ -1,69 +1,37 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\StockAdjustment;
-use Illuminate\View\View;
+use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\StockAdjustmentFormRequest;
 
 class StockAdjustmentController extends Controller
 {
-    public function index(): View
+    public function store(Request $r)
     {
-        $adjs = StockAdjustment::paginate(20);
-        return view('stock_adjustments.index', compact('adjs'));
-    }
+        $this->authorize('create', StockAdjustment::class);
 
-    public function create(): View
-    {
-        return view('stock_adjustments.create')->with('stockAdjustment', new StockAdjustment());
-    }
+        $data = $r->validate([
+            'product_id'=>'required|exists:products,id',
+            'new_stock'=>'required|integer|min:0',
+            'reason'=>'required|string|max:255',
+        ]);
 
-    public function store(StockAdjustmentFormRequest $request): RedirectResponse
-    {
-        $sa = StockAdjustment::create($request->validated());
-        $url = route('stock_adjustments.show', ['stock_adjustment' => $sa]);
-        $msg = "Ajuste de stock <a href='$url'><u>#{$sa->id}</u></a> creado correctamente.";
-        return redirect()->route('stock_adjustments.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
+        $product = Product::findOrFail($data['product_id']);
+        $old     = $product->stock;
 
-    public function show(StockAdjustment $stockAdjustment): View
-    {
-        return view('stock_adjustments.show', compact('stockAdjustment'));
-    }
+        $product->update(['stock'=>$data['new_stock']]);
 
-    public function edit(StockAdjustment $stockAdjustment): View
-    {
-        return view('stock_adjustments.edit', compact('stockAdjustment'));
-    }
+        StockAdjustment::create([
+            'product_id'=>$product->id,
+            'old_stock'=>$old,
+            'new_stock'=>$data['new_stock'],
+            'reason'=>$data['reason'],
+            'user_id'=>auth()->id(),
+        ]);
 
-    public function update(StockAdjustmentFormRequest $request, StockAdjustment $stockAdjustment): RedirectResponse
-    {
-        $stockAdjustment->update($request->validated());
-        $url = route('stock_adjustments.show', ['stock_adjustment' => $stockAdjustment]);
-        $msg = "Ajuste de stock <a href='$url'><u>#{$stockAdjustment->id}</u></a> actualizado correctamente.";
-        return redirect()->route('stock_adjustments.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
-
-    public function destroy(StockAdjustment $stockAdjustment): RedirectResponse
-    {
-        try {
-            $stockAdjustment->delete();
-            $type = 'success';
-            $msg  = "Ajuste de stock eliminado correctamente.";
-        } catch (\Exception $e) {
-            $type = 'danger';
-            $msg  = "Error al eliminar el ajuste de stock.";
-        }
-
-        return redirect()->back()
-                         ->with('alert-type', $type)
-                         ->with('alert-msg', $msg);
+        return back()
+            ->with('alert-type','success')
+            ->with('alert-msg',"Stock de {$product->name} ajustado de $old a {$data['new_stock']}");
     }
 }
