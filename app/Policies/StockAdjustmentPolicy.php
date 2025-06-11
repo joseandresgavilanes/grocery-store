@@ -13,12 +13,12 @@ class StockAdjustmentPolicy
      */
     public function create(User $user): bool
     {
-        return in_array($user->type, ['employee', 'board']);
+        return $user->isEmployee() || $user->isBoard();
     }
 
     // Si necesitas ver histórico:
     public function viewAny(User $user): bool
     {
-        return in_array($user->type, ['employee', 'board']);
+        return $user->isEmployee() || $user->isBoard();
     }
 }

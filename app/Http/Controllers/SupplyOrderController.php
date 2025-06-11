@@ -3,61 +3,76 @@ namespace App\Http\Controllers;
 
 use App\Models\SupplyOrder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class SupplyOrderController extends Controller
 {
-    public function index(): View
+    public function index()
     {
         $this->authorize('viewAny', SupplyOrder::class);
-        $orders = SupplyOrder::with('product')->paginate(20);
-        return view('supply-orders.index', compact('orders'));
+        $orders = SupplyOrder::with('product')->latest()->get();
+        return view('supply_orders.index', compact('orders'));
     }
 
-    public function create(): View
+    public function create()
     {
         $this->authorize('create', SupplyOrder::class);
-        return view('supply-orders.create', [
-            'order'=> new SupplyOrder(),
-            'products'=>\App\Models\Product::all(),
-        ]);
+        $products = Product::orderBy('name')->get();
+        return view('supply_orders.create', compact('products'));
     }
 
-    public function store(Request $r)
+    public function store(Request $request)
     {
         $this->authorize('create', SupplyOrder::class);
-        $data = $r->validate([
-            'product_id'=>'required|exists:products,id',
-            'quantity'=>'required|integer|min:1',
-        ]);
-        SupplyOrder::create(array_merge($data,['status'=>'requested']));
+
+        foreach ($request->input('items') as $prodId => $qty) {
+            SupplyOrder::create([
+                'product_id'            => $prodId,
+                'registered_by_user_id' => auth()->id(),
+                'quantity'              => $qty,
+                'status'                => SupplyOrder::STATUS_REQUESTED,
+            ]);
+        }
+
         return redirect()->route('supply-orders.index')
-            ->with('alert-type','success')
-            ->with('alert-msg','Supply order creada');
+            ->with('success', 'Órdenes de suministro creadas.');
+    }
+
+/** Automático: repone hasta stock_upper_limit */
+    public function autoGenerate()
+    {
+        $this->authorize('create', SupplyOrder::class);
+
+        $toRestock = Product::whereColumn('stock', '<', 'stock_lower_limit')->get();
+        foreach ($toRestock as $product) {
+            $qty = $product->stock_upper_limit - $product->stock;
+            SupplyOrder::create([
+                'product_id'            => $product->id,
+                'registered_by_user_id' => auth()->id(),
+                'quantity'              => $qty,
+                'status'                => SupplyOrder::STATUS_REQUESTED,
+            ]);
+        }
+
+        return redirect()->route('supply-orders.index')
+            ->with('success', 'Órdenes automáticas generadas.');
     }
 
     public function complete(SupplyOrder $supplyOrder)
     {
         $this->authorize('complete', $supplyOrder);
 
-        DB::transaction(function() use ($supplyOrder) {
-            $supplyOrder->update(['status'=>'completed']);
-            $supplyOrder->product
-                        ->increment('stock',$supplyOrder->quantity);
-        });
+        $supplyOrder->update(['status' => SupplyOrder::STATUS_COMPLETED]);
+        $product = $supplyOrder->product;
+        $product->increment('stock', $supplyOrder->quantity);
 
-        return back()
-            ->with('alert-type','success')
-            ->with('alert-msg',"SupplyOrder #{$supplyOrder->id} completada");
+        return back()->with('success', "Orden #{$supplyOrder->id} completada y stock actualizado.");
     }
 
     public function destroy(SupplyOrder $supplyOrder)
     {
         $this->authorize('delete', $supplyOrder);
         $supplyOrder->delete();
-        return back()
-            ->with('alert-type','success')
-            ->with('alert-msg',"SupplyOrder #{$supplyOrder->id} eliminada");
+        return back()->with('success', "Orden #{$supplyOrder->id} eliminada.");
     }
 }
