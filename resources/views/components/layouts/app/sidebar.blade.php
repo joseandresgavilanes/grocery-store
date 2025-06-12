@@ -62,20 +62,32 @@
 
         @endif
 
-        {{-- Inventario: empleados y board --}}
-        @if(in_array(auth()->user()->type, ['employee','board']))
-            <flux:navlist variant="outline">
-                <flux:navlist.group heading="Inventario">
-                    <flux:navlist.item
-                        icon="archive-box"
-                        :href="route('inventory.index')"
-                        :current="request()->routeIs('inventory.index')"
-                        wire:navigate
-                    >Ver inventario</flux:navlist.item>
-                </flux:navlist.group>
-            </flux:navlist>
 
-        @endif
+        @can('viewAny', App\Models\Product::class)
+  <flux:navlist variant="outline">
+    <flux:navlist.group heading="Inventario">
+      <flux:navlist.item
+        icon="archive-box"
+        :href="route('inventory.index')"
+        :current="request()->routeIs('inventory.index')"
+        wire:navigate
+      >Ver inventario</flux:navlist.item>
+    </flux:navlist.group>
+  </flux:navlist>
+@endcan
+
+@can('viewAny', App\Models\SupplyOrder::class)
+  <flux:navlist variant="outline">
+    <flux:navlist.group heading="Reposición">
+      <flux:navlist.item
+        icon="truck"
+        :href="route('supply-orders.index')"
+        :current="Str::startsWith(request()->route()->getName(),'supply-orders.')"
+        wire:navigate
+      >Órdenes de suministro</flux:navlist.item>
+    </flux:navlist.group>
+  </flux:navlist>
+@endcan
 
         {{-- Administración: solo board --}}
         @if(auth()->user()->type === 'board')

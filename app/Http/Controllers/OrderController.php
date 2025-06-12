@@ -66,7 +66,7 @@ class OrderController extends Controller
         $this->authorize('cancel', $order);
 
         // 1) Cambiar estado
-        $order->status = Order::STATUS_CANCELED;
+        $order->status === 'canceled';
         $order->save();
 
         // 2) Reembolsar

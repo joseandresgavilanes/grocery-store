@@ -12,13 +12,14 @@ use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\SupplyOrderController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 // Ruta pública de bienvenida
 Route::view('/', 'home')->name('home');
 
-Route::middleware(['auth', 'notBlocked'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
@@ -52,10 +53,41 @@ Route::middleware(['auth','can:member'])->group(function(){
      Route::resource('categories',CategoryController::class);
      Route::resource('products',ProductController::class);
      Route::resource('settings',SettingsController::class)->only(['index','update']);
+     Route::get('orders/pending',[OrderController::class,'pending'])->name('orders.pending');
+     Route::post('orders/{order}/complete',[OrderController::class,'complete'])->name('orders.complete');
      Route::post('orders/{order}/cancel',[OrderController::class,'cancel'])->name('orders.cancel');
+     Route::resource('inventory',InventoryController::class)->only(['index','update','destroy']);
      Route::post('settings/shipping',[ShippingSettingsController::class,'update'])->name('settings.shipping.update');
      Route::get('stats/global',[StatsController::class,'global'])->name('stats.global');
    });
+
+
+   Route::middleware(['auth','can:viewAny,App\Models\Product'])->get('inventory', [InventoryController::class,'index'])
+   ->name('inventory.index');
+
+// Ajustes de stock manual
+Route::middleware(['auth','can:create,App\Models\StockAdjustment'])->post('inventory/{product}/adjust',
+   [StockAdjustmentController::class,'store'])
+   ->name('inventory.adjust');
+
+// Órdenes de suministro
+Route::middleware(['auth','can:viewAny,App\Models\SupplyOrder'])->group(function(){
+  Route::get('supply-orders', [SupplyOrderController::class,'index'])
+       ->name('supply-orders.index');
+  Route::get('supply-orders/create', [SupplyOrderController::class,'create'])
+       ->name('supply-orders.create');
+  Route::post('supply-orders', [SupplyOrderController::class,'store'])
+       ->name('supply-orders.store');
+  // Auto-generar órdenes para productos bajo stock_lower_limit
+  Route::post('supply-orders/auto', [SupplyOrderController::class,'autoGenerate'])
+       ->name('supply-orders.auto');
+  // Completar orden (actualiza stock)
+  Route::post('supply-orders/{supplyOrder}/complete', [SupplyOrderController::class,'complete'])
+       ->name('supply-orders.complete');
+  // Eliminar orden
+  Route::delete('supply-orders/{supplyOrder}', [SupplyOrderController::class,'destroy'])
+       ->name('supply-orders.destroy');
+});
 
 Route::get('courses/showcase', [CourseController::class, 'showCase'])->name('courses.showcase');
 

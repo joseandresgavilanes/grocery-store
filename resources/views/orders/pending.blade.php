@@ -30,7 +30,7 @@
             </form>
 
             {{-- Botón Cancelar (solo board) --}}
-            @can('cancel-orders')
+            @can('cancel', $order)
               <form action="{{ route('orders.cancel', $order) }}" method="POST">
                 @csrf
                 <button type="submit" class="btn-warning">

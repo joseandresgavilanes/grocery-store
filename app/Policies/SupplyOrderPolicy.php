@@ -1,5 +1,4 @@
 <?php
-// app/Policies/SupplyOrderPolicy.php
 
 namespace App\Policies;
 
@@ -9,38 +8,36 @@ use App\Models\SupplyOrder;
 class SupplyOrderPolicy
 {
     /**
-     * Listar supply orders: employee o board.
+     * ¿Puede ver la lista de órdenes de suministro?
      */
     public function viewAny(User $user): bool
     {
-        return in_array($user->type, ['employee', 'board']);
+        return $user->isEmployee() || $user->isBoard();
     }
 
     /**
-     * Crear supply order (manual o auto): employee o board.
+     * ¿Puede crear órdenes de suministro manual o auto?
      */
     public function create(User $user): bool
     {
-        return in_array($user->type, ['employee', 'board']);
+        return $user->isEmployee() || $user->isBoard();
     }
 
     /**
-     * Completar supply order (status → completed + stock++): employee o board,
-     * y sólo si status = requested.
+     * ¿Puede marcar una orden de suministro como completada?
      */
-    public function complete(User $user, SupplyOrder $order): bool
+    public function complete(User $user, SupplyOrder $supplyOrder): bool
     {
-        return in_array($user->type, ['employee', 'board'])
-            && $order->status === 'requested';
+        return ($user->isEmployee() || $user->isBoard())
+            && $supplyOrder->status === 'requested';
     }
 
     /**
-     * Borrar supply order: employee o board,
-     * y sólo si no está completed (o según tu regla).
+     * ¿Puede eliminar una orden de suministro?
      */
-    public function delete(User $user, SupplyOrder $order): bool
+    public function delete(User $user, SupplyOrder $supplyOrder): bool
     {
-        return in_array($user->type, ['employee', 'board'])
-            && $order->status !== 'completed';
+        return $user->isBoard()
+            && $supplyOrder->status === 'requested';
     }
 }
