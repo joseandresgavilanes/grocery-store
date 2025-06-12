@@ -14,6 +14,17 @@
         <x-app-logo />
     </a>
 
+@if(auth()->user()?->photo)
+    <div class="mb-6 flex justify-center">
+        <img
+            src="{{auth()->user()->image_url}}"
+            alt="Imagen de {{ auth()->user()?->firstLastInitial() }}"
+            class="h-24 w-24 object-cover rounded-full border-2 border-zinc-300 dark:border-zinc-600"
+        >
+    </div>
+@endif
+
+
     {{-- Catálogo disponible para todos --}}
     <flux:navlist variant="outline">
         <flux:navlist.group heading="Catálogo">
@@ -104,6 +115,7 @@
                         <br>
                         <span class="text-xs">{{ auth()->user()->email }}</span>
                     </div>
+
                 </flux:menu.radio.group>
                 <flux:menu.separator/>
                 <flux:menu.radio.group>

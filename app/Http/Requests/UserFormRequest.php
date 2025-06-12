@@ -24,7 +24,7 @@ class UserFormRequest extends FormRequest
             'type'                         => 'required|in:member,board,employee,pending_member',
             'blocked'                      => 'required|boolean',
             'gender'                       => 'required|in:M,F',
-            'photo_url'                    => 'nullable|string',
+            'photo'                         => 'nullable|string',
             'nif'                          => 'nullable|string',
             'default_delivery_address'     => 'nullable|string',
             'default_payment_type'         => 'nullable|in:Visa,PayPal,MB WAY',

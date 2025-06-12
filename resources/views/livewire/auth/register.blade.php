@@ -7,13 +7,19 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads; // <-- Añadir este trait
 
 new #[Layout('components.layouts.auth')] class extends Component {
     public string $name = '';
     public string $email = '';
+    public string $gender = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public string $delivery_address = '';
+    public string $nif = '';
+    public $photo;
 
+    use WithFileUploads;
 
     /**
      * Handle an incoming registration request.
@@ -24,19 +30,25 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-            'gender' => ['required', 'in:Female,Male,Other'],
-            'profile_photo' => ['nullable', 'image', 'max:2048'], 
+            'gender' => ['required', 'in:F,M'],
+            'photo' => ['nullable', 'image', 'max:2048'],
             'delivery_address' => ['required', 'string', 'max:255'],
             'nif' => ['required', 'string', 'max:9'],
         ]);
+
+        if ($this->photo) {
+            $path = $this->photo->store('users', 'public');
+            $filename = basename($path);
+            $validated['photo'] = $filename;
+        }
 
         $validated['password'] = Hash::make($validated['password']);
 
         event(new Registered(($user = User::create($validated))));
 
         Auth::login($user);
-
-        $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
+        //se cambio la ruta por la de productos, antes tenia la del dashboard
+        $this->redirectIntended(route('products.index', absolute: false), navigate: true);
     }
 }; ?>
 
@@ -48,79 +60,40 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     <form wire:submit="register" class="flex flex-col gap-6">
         <!-- Name -->
-        <flux:input
-            wire:model="name"
-            :label="__('Name')"
-            type="text"
-            required
-            autofocus
-            autocomplete="name"
-            :placeholder="__('Full name')"
-        />
+        <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name"
+            :placeholder="__('Full name')" />
 
         <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email address')"
-            type="email"
-            required
-            autocomplete="email"
-            placeholder="email@example.com"
-        />
+        <flux:input wire:model="email" :label="__('Email address')" type="email" required autocomplete="email"
+            placeholder="email@example.com" />
 
 
         <!-- Gender -->
         <flux:select wire:model="gender" placeholder="Choose gender..." :label="__('Gender')">
-            <flux:select.option>Female</flux:select.option>
-            <flux:select.option>Male</flux:select.option>
-            <flux:select.option>Other</flux:select.option>
+            <flux:select.option value="F">Female</flux:select.option>
+            <flux:select.option value="M">Male</flux:select.option>
         </flux:select>
 
         <!-- Password -->
-        <flux:input
-            wire:model="password"
-            :label="__('Password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('Password')"
-        />
+        <flux:input wire:model="password" :label="__('Password')" type="password" required autocomplete="new-password"
+            :placeholder="__('Password')" />
 
         <!-- Confirm Password -->
-        <flux:input
-            wire:model="password_confirmation"
-            :label="__('Confirm password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('Confirm password')"
-        />
+        <flux:input wire:model="password_confirmation" :label="__('Confirm password')" type="password" required
+            autocomplete="new-password" :placeholder="__('Confirm password')" />
 
-        
+
         <!-- Profile photo Address -->
-        <flux:input type="file" wire:model="profile_photo" label="Profile photo"/>
+        <flux:input type="file" wire:model="photo" label="Profile photo" />
 
 
         <!-- Delivery Address -->
-        <flux:input
-            wire:model="delivery_address"
-            :label="__('Delivery Address')"
-            type="text"
-            required
-            autofocus
-            autocomplete="shipping street-address"
-            :placeholder="__('Delivery Address')"
-        />
+        <flux:input wire:model="delivery_address" :label="__('Delivery Address')" type="text" required autofocus
+            autocomplete="shipping street-address" :placeholder="__('Delivery Address')" />
 
         <!-- NIF -->
-        <flux:input
-            wire:model="nif"
-            :label="__('NIF')"
-            type="text"
-            required
-            autocomplete="tax-id"
-            :placeholder="__('NIF')"
-        />
+        <flux:input wire:model="nif" :label="__('NIF')" type="text" required autocomplete="tax-id"
+            :placeholder="__('NIF')" />
 
 
 

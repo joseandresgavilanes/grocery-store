@@ -70,6 +70,18 @@ Route::resource('disciplines', DisciplineController::class);
 Route::resource('departments', DepartmentController::class);
 
 Route::get('cart', [CartController::class, 'show'])->name('cart.show');
+
+// Añadir (o incrementar) items al carrito
 Route::post('cart/{product}', [CartController::class, 'addToCart'])->name('cart.add');
+
+// Actualizar cantidad de un item
+Route::patch('cart/{product}', [CartController::class, 'updateQuantity'])->name('cart.update');
+
+// Eliminar un item
+Route::delete('cart/{product}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+
+// Vaciar carrito completo
+Route::delete('cart', [CartController::class, 'destroy'])->name('cart.destroy');
+
 
 require __DIR__ . '/auth.php';

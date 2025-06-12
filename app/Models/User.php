@@ -24,7 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'type',
         'blocked',
         'gender',
-        'photo_url',
+        'photo',
         'nif',
         'default_delivery_address',
         'default_payment_type',
@@ -60,7 +60,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getImageUrlAttribute()
     {
-        if (Storage::disk('public')->exists("users/$this->photo")) {
+        if ($this->photo && \Storage::disk('public')->exists('users/' . $this->photo)) {
             return asset("storage/users/$this->photo");
         } else {
             return asset("storage/users/anonymous.png");
@@ -124,7 +124,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isEmployee(): bool
     {return $this->type === 'employee';}
-    
+
     public function isBoard(): bool
     {return $this->type === 'board';}
 }
