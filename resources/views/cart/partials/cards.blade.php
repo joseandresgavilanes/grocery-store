@@ -1,10 +1,10 @@
 @php
-    // Determinar stock insuficiente
+
     $lowStock = $product->stock < $item['quantity'];
 @endphp
 
 <tr class="border-t border-gray-200 dark:border-gray-700 {{ $lowStock ? 'bg-yellow-100' : '' }}">
-    <!-- Imagen + Nombre -->
+
     <td class="px-4 py-2 flex items-center space-x-4">
         <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-12 h-12 rounded">
         <span>{{ $product->name }}</span>
@@ -13,12 +13,12 @@
         @endif
     </td>
 
-    <!-- Precio unitario -->
+
     <td class="px-4 py-2 text-gray-800 dark:text-gray-100">
         {{ number_format($product->price, 2) }} $
     </td>
 
-    <!-- Cantidad: formulario PATCH -->
+
     <td class="px-4 py-2">
         <form method="POST" action="{{ route('cart.update', $product) }}" class="flex items-center space-x-1">
             @csrf
@@ -33,12 +33,12 @@
         </form>
     </td>
 
-    <!-- Subtotal -->
+
     <td class="px-4 py-2 text-gray-800 dark:text-gray-100">
         {{ number_format($product->price * $item['quantity'], 2) }} $
     </td>
 
-    <!-- Eliminar item -->
+
     <td class="px-4 py-2">
         <form method="POST" action="{{ route('cart.remove', $product) }}">
             @csrf

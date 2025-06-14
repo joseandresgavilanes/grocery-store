@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ItemsOrder extends Model
 {
     public $timestamps = false;
-     
+
     protected $fillable = [
         'order_id',
         'product_id',
@@ -22,7 +22,7 @@ class ItemsOrder extends Model
         'discount_applied' => 'float',
     ];
 
-    // RELACIONES
+
     public function order()
     {
         return $this->belongsTo(Order::class);

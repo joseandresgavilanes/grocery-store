@@ -75,7 +75,7 @@ class SupplyOrderController extends Controller
             ->with('success', 'Órdenes de suministro creadas.');
     }
 
-    public function autoGenerate(): RedirectResponse    
+    public function autoGenerate(): RedirectResponse
     {
         $this->authorize('create', SupplyOrder::class);
 
@@ -138,13 +138,5 @@ class SupplyOrderController extends Controller
         return back()->with('success', "Orden #{$supplyOrder->id} cancelada.");
     }
 
-    //Si no funciona el destroy de arriba, cambiar para que solo borre
-    // public function destroy(SupplyOrder $supplyOrder): RedirectResponse
-    // {
-    //     $this->authorize('delete', $supplyOrder);
 
-    //     $supplyOrder->delete();
-
-    //     return back()->with('success', "Orden #{$supplyOrder->id} eliminada.");
-    // }
 }

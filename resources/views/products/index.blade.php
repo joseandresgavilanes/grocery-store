@@ -1,9 +1,6 @@
-{{-- resources/views/products/index.blade.php --}}
 <x-layouts.main-content title="Catálogo de Productos">
-    {{-- 1) Barra de filtros / búsqueda --}}
     <div class="mb-6 flex flex-wrap items-center gap-4">
         <form method="GET" action="{{ route('products.index') }}" class="flex flex-wrap items-center gap-2">
-            {{-- Filtro: Categoría --}}
             <select name="category_id" class="border-gray-300 rounded px-2 py-1">
                 <option value="">Todas las categorías</option>
                 @foreach($categories as $cat)
@@ -14,7 +11,6 @@
                 @endforeach
             </select>
 
-            {{-- Búsqueda: Nombre --}}
             <input
                 type="text"
                 name="q"
@@ -23,7 +19,6 @@
                 class="border-gray-300 rounded px-2 py-1"
             >
 
-            {{-- Rango de precio --}}
             <input
                 type="number"
                 name="price_min"
@@ -44,7 +39,6 @@
                 min="0"
             >
 
-            {{-- Ordenamiento --}}
             <select name="sort_by" class="border-gray-300 rounded px-2 py-1">
                 <option value="name"  {{ request('sort_by')=='name'  ? 'selected' : '' }}>Nombre</option>
                 <option value="price" {{ request('sort_by')=='price' ? 'selected' : '' }}>Precio</option>
@@ -62,7 +56,6 @@
         </form>
     </div>
 
-    {{-- 2) Grid de productos --}}
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach($products as $product)
@@ -71,7 +64,6 @@
         </div>
     </div>
 
-    {{-- 3) Paginación --}}
     <div class="mt-6">
         {{ $products->links() }}
     </div>

@@ -29,9 +29,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        //
-        // 1) Registrar las políticas en los modelos
-        //
+
         Gate::policy(Order::class, OrderPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);
         Gate::policy(SupplyOrder::class, SupplyOrderPolicy::class);
@@ -41,9 +39,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(SettingsShippingCosts::class,  SettingsShippingCostsPolicy::class);
         Gate::policy(Settings::class, SettingsPolicy::class);
 
-        //
-        // 2) Definir gates para los roles
-        //
+
         Gate::define('member', fn(User $user) =>
             in_array($user->type, ['member', 'board'], true)
         );

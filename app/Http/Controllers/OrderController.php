@@ -29,16 +29,16 @@ class OrderController extends Controller
     {
         $this->authorize('complete', $order);
 
-        // 1) Actualizar estado
+
         $order->status ='completed';
         $order->save();
 
-        // 2) Generar PDF
+
         $pdf = PDF::loadView('orders.receipt', compact('order'));
         $path = "receipts/order-{$order->id}.pdf";
         Storage::put("public/{$path}", $pdf->output());
 
-        // 3) Actualizar stock y registrar ajustes
+
         foreach ($order->items as $item) {
             $product = $item->product;
             $old = $product->stock;
@@ -53,7 +53,7 @@ class OrderController extends Controller
             ]);
         }
 
-        // 4) Enviar email con recibo
+
         Mail::to($order->member->email)
             ->send(new OrderCompleted($order, $path));
 
@@ -65,11 +65,11 @@ class OrderController extends Controller
     {
         $this->authorize('cancel', $order);
 
-        // 1) Cambiar estado
+
         $order->status = 'canceled';
         $order->save();
 
-        // 2) Reembolsar
+
         $card->refund($order->member->card, $order->total);
 
         return redirect()->route('orders.pending')

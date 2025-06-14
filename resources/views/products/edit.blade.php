@@ -17,7 +17,6 @@
             @csrf
             @method('PUT')
 
-            <!-- Category -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
                 <select name="category_id"
@@ -33,7 +32,6 @@
                 </select>
             </div>
 
-            <!-- Name -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
                 <input type="text" name="name" value="{{ old('name', $product->name) }}"
@@ -41,7 +39,6 @@
                     required>
             </div>
 
-            <!-- Price -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price (€)</label>
                 <input type="number" name="price" value="{{ old('price', $product->price) }}" step="0.01"
@@ -50,7 +47,6 @@
                     required>
             </div>
 
-            <!-- Stock -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock</label>
                 <input type="number" name="stock" value="{{ old('stock', $product->stock) }}" min="0"
@@ -58,14 +54,12 @@
                     required>
             </div>
 
-            <!-- Description -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
                 <textarea name="description" rows="4"
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('description', $product->description) }}</textarea>
             </div>
 
-            <!-- Photo preview above the file input -->
             <div>
                 @if ($product->photo)
                     <img src="{{ $product->image_url }}" alt="Current Photo"
@@ -75,12 +69,10 @@
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Photo (new)</label>
                 <input type="file" name="photo" accept="image/*"
                     class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300
-                    file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-200
-                    file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4">
+                file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-200
+                file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4">
             </div>
 
-
-            <!-- Stock limits -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Lower Stock Limit</label>
@@ -96,7 +88,6 @@
                 </div>
             </div>
 
-            <!-- Quantity discount -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Minimum Qty for
@@ -113,7 +104,6 @@
                 </div>
             </div>
 
-            <!-- Submit button -->
             <div class="flex justify-end mt-6">
                 <button type="submit"
                     class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">

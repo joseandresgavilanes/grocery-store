@@ -23,7 +23,7 @@
 
             <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
 
-                <!-- Fields for name and image -->
+
                 <div class="w-full">
                     <div class="mb-4">
                         <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>

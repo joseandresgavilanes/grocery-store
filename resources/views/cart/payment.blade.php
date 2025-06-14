@@ -7,7 +7,7 @@
 
         <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Billing Information</h2>
 
-        <!-- Información del socio -->
+
         <div>
             <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Client</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <!-- Resumen del pedido -->
+
         <div>
             <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Order Summary</h3>
             <ul class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -57,7 +57,7 @@
             </ul>
         </div>
 
-        <!-- Métodos de pago -->
+
         <div>
             <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Payment Method</h3>
             <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-4 rounded space-y-3">
@@ -83,7 +83,7 @@
             </div>
         </div>
 
-        <!-- Botón para confirmar -->
+
         <form method="POST" action="{{ route('cart.checkout') }}">
             @csrf
             <button type="submit"

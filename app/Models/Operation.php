@@ -9,7 +9,7 @@ class Operation extends Model
     protected $fillable = [
         'card_id',
         'order_id',
-        'type',       // 'credit' o 'debit'
+        'type',
         'amount',
         'date',
         'payment_reference',

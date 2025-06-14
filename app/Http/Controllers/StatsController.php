@@ -13,7 +13,7 @@ class StatsController extends Controller
 {
     public function __construct()
     {
-        // Solo permite acceso a usuarios administradores
+
         $this->middleware(function ($request, $next) {
             if (auth()->user()?->type !== 'board') {
                 abort(403);
@@ -29,7 +29,7 @@ class StatsController extends Controller
         $selectedProduct = $request->input('product_id');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        $filterType = $request->input('filter_type', 'units'); 
+        $filterType = $request->input('filter_type', 'units');
 
         $salesChart = null;
 

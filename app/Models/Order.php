@@ -18,8 +18,7 @@ class Order extends Model
         'custom',
     ];
 
-    //pdf_receipt
-    //cancel_reason
+
 
     protected $casts = [
         'date'           => 'date',
@@ -29,7 +28,7 @@ class Order extends Model
         'custom'         => 'array',
     ];
 
-    // RELACIONES
+
     public function member()
     {
         return $this->belongsTo(User::class, 'member_id');

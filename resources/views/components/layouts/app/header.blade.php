@@ -43,7 +43,7 @@
                 </flux:tooltip>
             </flux:navbar>
 
-            <!-- Desktop User Menu -->
+
             <flux:dropdown position="top" align="end">
                 <flux:profile
                     class="cursor-pointer"
@@ -88,7 +88,7 @@
             </flux:dropdown>
         </flux:header>
 
-        <!-- Mobile Menu -->
+
         <flux:sidebar stashable sticky class="lg:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 

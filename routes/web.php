@@ -67,6 +67,10 @@ Route::delete('cart', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::get('/estadisticas', [StatsController::class, 'index'])->name('stats.index');
 Route::get('/stats/export', [StatsController::class, 'export'])->name('stats.export');
 
+//link para el updateAdmin
+Route::put('/admin/users/{user}', [UserController::class, 'updateAdmin'])->name('users.updateAdmin');
+
+
 /*
 |--------------------------------------------------------------------------
 | Authentication Routes
@@ -191,7 +195,7 @@ Route::middleware(['auth'])->group(function(){
         // Tramos de envio
 
         Route::resource('shipping_costs', SettingsShippingCostsController::class);
-          
+
 
         // Ajustes de negocio
         Route::resource('categories', CategoryController::class);

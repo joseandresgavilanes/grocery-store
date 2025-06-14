@@ -7,9 +7,7 @@ use App\Models\Product;
 
 class ProductPolicy
 {
-    /**
-     * ¿Puede ver el inventario?
-     */
+
     public function viewAny(User $user): bool
     {
         return $user->isEmployee() || $user->isBoard();
@@ -29,7 +27,7 @@ class ProductPolicy
     }
     public function delete(User $user, Product $product): bool
     {
-        // controller comprueba orderItems()->count() para soft delete
+
         return $user->isBoard();
     }
 }
