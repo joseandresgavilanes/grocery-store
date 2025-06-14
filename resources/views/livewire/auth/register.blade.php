@@ -15,7 +15,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public string $gender = '';
     public string $password = '';
     public string $password_confirmation = '';
-    public string $delivery_address = '';
+    public string $default_delivery_address = '';
     public string $nif = '';
     public $photo;
 
@@ -32,7 +32,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
             'gender' => ['required', 'in:F,M'],
             'photo' => ['nullable', 'image', 'max:2048'],
-            'delivery_address' => ['required', 'string', 'max:255'],
+            'default_delivery_address' => ['required', 'string', 'max:255'],
             'nif' => ['required', 'string', 'max:9'],
         ]);
 
@@ -88,7 +88,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
 
         <!-- Delivery Address -->
-        <flux:input wire:model="delivery_address" :label="__('Delivery Address')" type="text" required autofocus
+        <flux:input wire:model="default_delivery_address" :label="__('Delivery Address')" type="text" required autofocus
             autocomplete="shipping street-address" :placeholder="__('Delivery Address')" />
 
         <!-- NIF -->
