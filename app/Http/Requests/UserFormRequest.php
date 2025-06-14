@@ -12,24 +12,25 @@ class UserFormRequest extends FormRequest
     }
 
     public function rules(): array
-    {
-        $userId = $this->route('user')?->id;
+{
+    $userId = $this->user()->id; // Usa el ID del usuario autenticado
 
-        return [
-            'name'                         => 'required|string|max:255',
-            'email'                        => 'required|email|unique:users,email' . ($userId ? ",$userId" : ''),
-            'password'                     => $this->isMethod('post')
+    return [
+        'name'                         => 'required|string|max:255',
+        'email'                        => 'required|email|unique:users,email,' . $userId,
+        'password'                     => $this->isMethod('post')
                                                 ? 'required|string|min:8|confirmed'
                                                 : 'nullable|string|min:8|confirmed',
-            'type'                         => 'sometimes|in:member,board,employee,pending_member',
-            'blocked'                      => 'sometimes|boolean',
-            'gender'                       => 'required|in:M,F',
-            'photo'                         => 'nullable|string',
-            'nif'                          => 'nullable|string',
-            'default_delivery_address'     => 'nullable|string',
-            'default_payment_type'         => 'nullable|in:Visa,PayPal,MB WAY',
-            'default_payment_reference'    => 'nullable|string',
-            'custom'                       => 'nullable|array',
-        ];
-    }
+        'type'                         => 'sometimes|in:member,board,employee,pending_member',
+        'blocked'                      => 'sometimes|boolean',
+        'gender'                       => 'required|in:M,F',
+        'photo'                        => 'nullable|image|max:2048',
+        'nif'                          => 'nullable|string',
+        'default_delivery_address'     => 'nullable|string',
+        'default_payment_type'         => 'nullable|in:Visa,PayPal,MB WAY',
+        'default_payment_reference'    => 'nullable|string',
+        'custom'                       => 'nullable|array',
+    ];
+}
+
 }

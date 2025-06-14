@@ -14,6 +14,9 @@ use App\Models\StockAdjustment;
 use App\Policies\OrderPolicy;
 use App\Policies\SupplyOrderPolicy;
 use App\Policies\StockAdjustmentPolicy;
+use App\Policies\UserPolicy;
+use App\Policies\ProductPolicy;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,8 +26,10 @@ class AppServiceProvider extends ServiceProvider
         // 1) Registrar las políticas en los modelos
         //
         Gate::policy(Order::class, OrderPolicy::class);
+        Gate::policy(Product::class, ProductPolicy::class);
         Gate::policy(SupplyOrder::class, SupplyOrderPolicy::class);
         Gate::policy(StockAdjustment::class, StockAdjustmentPolicy::class);
+        Gate::policy(User::class, UserPolicy::class);
 
         //
         // 2) Definir gates para los roles

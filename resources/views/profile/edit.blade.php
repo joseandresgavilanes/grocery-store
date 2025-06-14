@@ -7,18 +7,15 @@
         <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Edit Profile</h2>
 
         @if ($errors->any())
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong class="font-bold">Errores:</strong>
-        <ul class="mt-2 list-disc list-inside text-sm">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
-
-
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <strong class="font-bold">Errores:</strong>
+                <ul class="mt-2 list-disc list-inside text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <form class="space-y-6" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
             @csrf
@@ -96,20 +93,22 @@
 
             <!-- Password -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New
-                    Password</label>
+                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    New Password
+                </label>
                 <input type="password" id="password" name="password"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                <p class="text-xs text-gray-500 mt-1">Leave blank if you don’t want to change it.</p>
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500" />
             </div>
 
             <!-- Confirm Password -->
-            <div>
-                <label for="password_confirmation"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
+            <div class="mt-4">
+                <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Confirm New Password
+                </label>
                 <input type="password" id="password_confirmation" name="password_confirmation"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500" />
             </div>
+
 
             <!-- Profile Photo -->
             <div>

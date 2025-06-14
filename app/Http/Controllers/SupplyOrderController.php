@@ -30,7 +30,7 @@ class SupplyOrderController extends Controller
                 'product_id'            => $prodId,
                 'registered_by_user_id' => auth()->id(),
                 'quantity'              => $qty,
-                'status'                => SupplyOrder::STATUS_REQUESTED,
+                'status'                => 'requested',
             ]);
         }
 
@@ -50,7 +50,7 @@ class SupplyOrderController extends Controller
                 'product_id'            => $product->id,
                 'registered_by_user_id' => auth()->id(),
                 'quantity'              => $qty,
-                'status'                => SupplyOrder::STATUS_REQUESTED,
+                'status'                => 'requested',
             ]);
         }
 
@@ -62,7 +62,7 @@ class SupplyOrderController extends Controller
     {
         $this->authorize('complete', $supplyOrder);
 
-        $supplyOrder->update(['status' => SupplyOrder::STATUS_COMPLETED]);
+        $supplyOrder->update(['status' => 'completed']);
         $product = $supplyOrder->product;
         $product->increment('stock', $supplyOrder->quantity);
 

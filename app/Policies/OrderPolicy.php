@@ -10,7 +10,7 @@ class OrderPolicy
     /**
      * ¿Puede ver la lista de pedidos pendientes?
      */
-    public function viewAnyPending(User $user): bool
+    public function viewAny(User $user): bool
     {
         return $user->isEmployee() || $user->isBoard();
     }

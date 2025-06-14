@@ -52,12 +52,9 @@
             >Carrito</flux:navlist.item>
         </flux:navlist.group>
     </flux:navlist>
+@auth
 
-    @auth
-        {{-- Pedidos: empleados y board solo ven pedidos pendientes --}}
-        @if(in_array(auth()->user()->type, ['employee','board']))
-
-        @can('viewAnyPending', App\Models\Order::class)
+@can('viewAny', App\Models\Order::class)
   <flux:navlist variant="outline">
     <flux:navlist.group heading="Pedidos">
       <flux:navlist.item
@@ -70,10 +67,7 @@
   </flux:navlist>
 @endcan
 
-        @endif
-
-
-        @can('viewAny', App\Models\Product::class)
+@can('viewAny', App\Models\Product::class)
   <flux:navlist variant="outline">
     <flux:navlist.group heading="Inventario">
       <flux:navlist.item
@@ -85,45 +79,56 @@
     </flux:navlist.group>
   </flux:navlist>
 @endcan
+        {{-- Órdenes de suministro (empleados & board) --}}
+        @can('viewAny', App\Models\SupplyOrder::class)
+        <flux:navlist variant="outline">
+            <flux:navlist.group heading="Reposición">
+                <flux:navlist.item
+                    icon="truck"
+                    :href="route('supply-orders.index')"
+                    :current="Str::startsWith(request()->route()->getName(), 'supply-orders.')"
+                    wire:navigate
+                >Órdenes de suministro</flux:navlist.item>
+            </flux:navlist.group>
+        </flux:navlist>
+        @endcan
 
-@can('viewAny', App\Models\SupplyOrder::class)
-  <flux:navlist variant="outline">
-    <flux:navlist.group heading="Reposición">
-      <flux:navlist.item
-        icon="truck"
-        :href="route('supply-orders.index')"
-        :current="Str::startsWith(request()->route()->getName(),'supply-orders.')"
-        wire:navigate
-      >Órdenes de suministro</flux:navlist.item>
-    </flux:navlist.group>
-  </flux:navlist>
-@endcan
+        {{-- Administración de plataforma (solo board) --}}
+        @can('viewAny', App\Models\User::class)
+        <flux:navlist variant="outline">
+            <flux:navlist.group heading="Administración">
+                <flux:navlist.item
+                    icon="users"
+                    :href="route('users.index')"
+                    :current="request()->routeIs('users.*')"
+                    wire:navigate
+                >Usuarios</flux:navlist.item>
+                <flux:navlist.item
+                    icon="folder-minus"
+                    :href="route('categories.index')"
+                    :current="request()->routeIs('categories.*')"
+                    wire:navigate
+                >Categorías</flux:navlist.item>
+                <flux:navlist.item
+                    icon="shopping-bag"
+                    :href="route('products.index')"
+                    :current="request()->routeIs('products.*')"
+                    wire:navigate
+                >Productos</flux:navlist.item>
+                
+             
+                <flux:navlist.item
+                    icon="chart-bar"
+                    :href="route('stats.global')"
+                    :current="request()->routeIs('stats.global')"
+                    wire:navigate
+                >Estadísticas</flux:navlist.item>
+            </flux:navlist.group>
+        </flux:navlist>
+        @endcan
 
-        {{-- Administración: solo board --}}
-        @if(auth()->user()->type === 'board')
-            <flux:navlist variant="outline">
-                <flux:navlist.group heading="Administración">
-                    <flux:navlist.item
-                        icon="users"
-                        :href="route('users.index')"
-                        :current="request()->routeIs('users.*')"
-                        wire:navigate
-                    >Usuarios</flux:navlist.item>
-                    <flux:navlist.item
-                        icon="folder-minus"
-                        :href="route('categories.index')"
-                        :current="request()->routeIs('categories.*')"
-                        wire:navigate
-                    >Categorías</flux:navlist.item>
-
-
-                </flux:navlist.group>
-            </flux:navlist>
-        @endif
-
-        {{-- Menú de usuario autenticado al pie --}}
+        {{-- Menú usuario autenticado al pie --}}
         <flux:spacer/>
-
         <flux:dropdown position="bottom" align="start">
             <flux:profile
                 :name="auth()->user()?->firstLastName()"
@@ -131,22 +136,16 @@
                 icon-trailing="chevrons-up-down"
             />
             <flux:menu class="w-[220px]">
-                <flux:menu.radio.group>
-                    <div class="p-2 text-sm">
-                        <span class="font-semibold">{{ auth()->user()->name }}</span>
-                        <br>
-                        <span class="text-xs">{{ auth()->user()->email }}</span>
-                    </div>
-
-                </flux:menu.radio.group>
+                <div class="p-2 text-sm">
+                    <span class="font-semibold">{{ auth()->user()->name }}</span><br>
+                    <span class="text-xs">{{ auth()->user()->email }}</span>
+                </div>
                 <flux:menu.separator/>
-                <flux:menu.radio.group>
-                    <flux:menu.item
-                        :href="route('settings.profile')"
-                        icon="cog"
-                        wire:navigate
-                    >Settings</flux:menu.item>
-                </flux:menu.radio.group>
+                <flux:menu.item
+                    :href="route('settings.profile')"
+                    icon="cog"
+                    wire:navigate
+                >Settings</flux:menu.item>
                 <flux:menu.separator/>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -158,6 +157,7 @@
                 </form>
             </flux:menu>
         </flux:dropdown>
+
     @else
         {{-- Enlaces de login para invitados --}}
         <flux:spacer/>

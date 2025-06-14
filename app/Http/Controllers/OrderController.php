@@ -15,7 +15,7 @@ class OrderController extends Controller
 {
     public function pending()
     {
-        $this->authorize('viewAnyPending', Order::class);
+        $this->authorize('viewAny', Order::class);
 
         $orders = Order::with('member')
             ->where('status', 'pending')
