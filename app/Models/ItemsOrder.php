@@ -13,16 +13,17 @@ class ItemsOrder extends Model
         'product_id',
         'quantity',
         'unit_price',
-        'discount_applied',
+        'discount',
+        'subtotal',      
     ];
 
     protected $casts = [
-        'quantity'         => 'integer',
-        'unit_price'       => 'float',
-        'discount_applied' => 'float',
+        'quantity'   => 'integer',
+        'unit_price' => 'float',
+        'discount'   => 'float',
+        'subtotal'   => 'float',
     ];
 
-    // RELACIONES
     public function order()
     {
         return $this->belongsTo(Order::class);

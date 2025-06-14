@@ -18,7 +18,7 @@ class OrderFormRequest extends FormRequest
             'status'          => 'required|in:pending,completed,canceled',
             'date'            => 'required|date',
             'total_items'     => 'required|numeric|min:0',
-            'shipping_costs'  => 'required|numeric|min:0',
+            'shipping_cost'  => 'required|numeric|min:0',
             'total'           => 'required|numeric|min:0',
             'nif'             => 'nullable|string',
             'delivery_address'=> 'required|string',

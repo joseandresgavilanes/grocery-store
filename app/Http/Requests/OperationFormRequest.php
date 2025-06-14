@@ -16,7 +16,7 @@ class OperationFormRequest extends FormRequest
         return [
             'card_id'           => 'required|integer|exists:cards,id',
             'type'              => 'required|in:credit,debit',
-            'amount'            => 'required|numeric|min:0',
+            'value'            => 'required|numeric|min:0',
             'date'              => 'required|date',
             'payment_reference' => 'nullable|string',
             'custom'            => 'nullable|array',

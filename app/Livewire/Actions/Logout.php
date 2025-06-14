@@ -12,6 +12,8 @@ class Logout
      */
     public function __invoke()
     {
+        Session::forget('cart');
+        
         Auth::guard('web')->logout();
 
         Session::invalidate();

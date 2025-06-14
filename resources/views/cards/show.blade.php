@@ -77,7 +77,7 @@
             <td class="p-2 border">{{ ucfirst($op->type) }}</td>
             <td class="p-2 border text-right">
               {{ $op->type === 'debit' ? '-' : '+' }}
-              {{ number_format($op->amount,2,',','.') }} €
+              {{ number_format($op->value,2,',','.') }} €
             </td>
             <td class="p-2 border">{{ $op->description }}</td>
           </tr>

@@ -11,25 +11,23 @@ class Order extends Model
         'status',
         'date',
         'total_items',
-        'shipping_costs',
+        'shipping_cost',   
         'total',
         'nif',
         'delivery_address',
+        'pdf_receipt',     
+        'cancel_reason',   
         'custom',
     ];
 
-    //pdf_receipt
-    //cancel_reason
-
     protected $casts = [
-        'date'           => 'date',
-        'total_items'    => 'float',
-        'shipping_costs' => 'float',
-        'total'          => 'float',
-        'custom'         => 'array',
+        'date'            => 'date',
+        'total_items'     => 'float',
+        'shipping_costs'  => 'float', 
+        'total'           => 'float',
+        'custom'          => 'array',
     ];
 
-    // RELACIONES
     public function member()
     {
         return $this->belongsTo(User::class, 'member_id');

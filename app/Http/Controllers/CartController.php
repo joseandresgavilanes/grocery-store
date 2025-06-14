@@ -10,42 +10,36 @@ use App\Models\Operation;
 use App\Models\Order;
 use App\Models\ItemsOrder;
 use App\Services\Payment;
+use App\Models\SettingsShippingCosts;
 
 class CartController extends Controller
 {
-    // Coste fijo de envío
-    const SHIPPING_COST = 5.0;
-
+    
 private function getCartData(): array
 {
-    $cart = session()->get('cart', []);
+    $cart = session('cart', []);
+    $products = Product::findMany(array_keys($cart))->keyBy('id');
 
-    $productIds = array_keys($cart);
+    $items = array_map(fn($qty, $prod) => [
+        'product'  => $products[$prod],
+                'quantity' => (int) $qty,
+    ], $cart, array_keys($cart));
 
-    $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+    $subtotal = array_reduce($items, fn($sum,$i)=> $sum + $i['product']->price*$i['quantity'], 0);
 
-    $items = [];
-
-    foreach ($cart as $productId => $item) {
-        if (isset($products[$productId])) {
-            $items[] = [
-                'product' => $products[$productId],
-                'quantity' => $item['quantity'],
-            ];
-        }
-    }
-
-    $subtotal = array_reduce($items, function ($carry, $item) {
-        return $carry + ($item['product']->price * $item['quantity']);
-    }, 0);
-
-    $shipping = self::SHIPPING_COST;
+    // --- Shipping dinámico
+    $rule = SettingsShippingCosts::query()
+      ->where('min_value_threshold', '<=', $subtotal)
+      ->where(function($q) use($subtotal){
+         $q->where('max_value_threshold', '>=', $subtotal)
+           ->orWhereNull('max_value_threshold');
+      })
+      ->first();
+    $shipping = $rule?->shipping_cost ?? 0;
 
     $total = $subtotal + $shipping;
 
-    //dd(compact('items', 'subtotal', 'shipping', 'total'));
-
-    return compact('items', 'subtotal', 'shipping', 'total');
+    return compact('items','subtotal','shipping','total');
 }
 
 
@@ -135,88 +129,97 @@ private function getCartData(): array
         $request->session()->forget('cart');
         return back()->with('success', 'Carrito vaciado');
     }
-public function checkout(Request $request): RedirectResponse
-    {
-        $user = auth()->user();
 
-        if (! $user->isMember()) {
-            return redirect()->route('home')
-                             ->with('error', 'Sólo los socios pueden realizar compras.');
-        }
 
-        $cart = $request->session()->get('cart', []);
-        if (empty($cart)) {
-            return back()->with('warning', 'Tu carrito está vacío.');
-        }
+public function checkout(Request $r): RedirectResponse
+{
+    $user = auth()->user();
 
-        // Calcular totales
-        $subtotal = collect($cart)
-            ->sum(fn($item) => $item['product']->precio * $item['quantity']);
-        $shipping = self::SHIPPING_COST;
-        $total    = $subtotal + $shipping;
-
-        // Fondos suficientes?
-        $card = $user->card;
-        if ($card->balance < $total) {
-            return redirect()->route('card.show')
-                             ->with('error', 'Fondos insuficientes en tu tarjeta virtual. Por favor, recarga primero.');
-        }
-
-        // Debitar tarjeta (Opción B)
-        $card->balance -= $total;
-        $card->save();
-
-        Operation::create([
-            'card_id'     => $card->id,
-            'type'        => 'debit',
-            'amount'      => $total,
-            'user_id'     => $user->id,
-            'description' => "Compra por €{$total}",
-        ]);
-
-        // Crear orden en “preparing”
-        $order = Order::create([
-            'member_id'       => $user->id,
-            'status'          => 'preparing',
-            'date'            => now(),
-            'total_items'     => $subtotal,
-            'shipping_costs'  => $shipping,
-            'total'           => $total,
-            'nif'             => $user->nif,
-            'delivery_address'=> $user->default_delivery_address,
-        ]);
-
-        // Líneas de pedido y check stock
-        $outOfStock = false;
-        foreach ($cart as $entry) {
-            $product = $entry['product'];
-            $qty     = $entry['quantity'];
-
-            ItemsOrder::create([
-                'order_id'   => $order->id,
-                'product_id' => $product->id,
-                'quantity'   => $qty,
-                'price'      => $product->precio,
-                'subtotal'   => $product->precio * $qty,
-            ]);
-
-            if ($product->stock < $qty) {
-                $outOfStock = true;
-            }
-        }
-
-        // Vaciar carrito
-        $request->session()->forget('cart');
-
-        // Mensaje final
-        $msg = '¡Pedido confirmado! Tu orden está en preparación.';
-        if ($outOfStock) {
-            $msg .= ' Atención: algunos productos están sin stock y la entrega puede retrasarse.';
-        }
-
-        return redirect()->route('orders.history')
-                         ->with('success', $msg);
+    // Sólo socios pueden comprar
+    if (! $user->isMember()) {
+        return redirect()->route('login')
+                         ->with('error', 'Sólo socios pueden comprar. Por favor, identifícate.');
     }
 
+    // Validar datos mínimos (para testing solo aceptamos virtual)
+    $r->validate([
+        'delivery_address' => 'required|string',
+        'nif'              => 'required|string',
+        'payment_method'   => 'required|in:virtual',
+    ]);
+
+    // Carga carrito
+    extract($this->getCartData()); // $items, $subtotal, $shipping, $total
+
+    if (empty($items)) {
+        return back()->with('warning', 'Tu carrito está vacío.');
+    }
+
+    // Sólo virtual card por ahora…
+    $card = $user->card;
+    if ($card->balance < $total) {
+        return back()->with('error', 'Fondos insuficientes en tarjeta virtual.');
+    }
+
+    $card->decrement('balance', $total);
+
+    // 1) Crear orden
+    $order = Order::create([
+        'member_id'        => $user->id,
+        'status'           => 'pending',
+        'date'             => now(),
+        'total_items'      => $subtotal,
+        'shipping_cost'   => $shipping,
+        'total'            => $total,
+        'nif'              => $r->nif,
+        'delivery_address' => $r->delivery_address,
+    ]);
+
+    Operation::create([
+        'card_id'           => $card->id,
+        'order_id'          => $order->id,
+        'type'              => 'debit',
+        'value'             => $total,
+        'date'              => now()->toDateString(),
+        'debit_type'        => 'order',
+        'credit_type'       => null,
+        'payment_type'      => null,
+        'payment_reference' => null,
+    ]);
+
+    // 3) Crear cada línea de pedido
+    $outOfStock = false;
+    foreach ($items as $i) {
+        $p = $i['product'];
+        $q = $i['quantity'];
+
+        ItemsOrder::create([
+            'order_id'   => $order->id,
+            'product_id' => $p->id,
+            'quantity'   => $q,
+            'unit_price'      => $p->price,
+            'discount'   => ($p->discount && $q >= $p->discount_min_qty)
+                          ? round($p->price * $p->discount * $q, 2)
+                          : 0,
+            'subtotal'   => $p->price * $q,
+        ]);
+
+        if ($p->stock < $q) {
+            $outOfStock = true;
+        }
+    }
+
+    // 4) Vaciar carrito
+    session()->forget('cart');
+
+    // 5) Mensaje de éxito
+    $msg = 'Pedido confirmado. Se está preparando.';
+    if ($outOfStock) {
+        $msg .= ' Algunos productos pueden retrasarse por falta de stock.';
+    }
+
+    return redirect()->route('products.index')
+                     ->with('success', $msg);
+}
 
 }

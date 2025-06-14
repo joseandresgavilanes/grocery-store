@@ -7,19 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class Operation extends Model
 {
     protected $fillable = [
-        'card_id',
-        'order_id',
-        'type',       // 'credit' o 'debit'
-        'amount',
-        'date',
+        'card_id',           
+        'order_id',         
+        'type',             
+        'value',             
+        'date',            
+        'debit_type',      
+        'credit_type',    
+        'payment_type',     
         'payment_reference',
-        'custom',
     ];
 
     protected $casts = [
-        'amount'            => 'float',
-        'date'              => 'datetime',
-        'custom'            => 'array',
+        'value'           => 'float',
+        'date'            => 'date',
     ];
 
     public function card()
