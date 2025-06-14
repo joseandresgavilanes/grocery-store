@@ -17,14 +17,16 @@ class Category extends Model
         'custom' => 'array'
     ];
 
-    public function getImageUrlAttribute()
+
+        public function getImageUrlAttribute()
     {
-        if (Storage::disk('public')->exists("categories/$this->image")) {
-            return asset("storage/courses/$this->image");
+        if ($this->image && \Storage::disk('public')->exists('categories/' . $this->image)) {
+            return asset("storage/categories/$this->image");
         } else {
             return asset("storage/categories/category_no_image.png");
         }
     }
+
 
     public function products()
     {
