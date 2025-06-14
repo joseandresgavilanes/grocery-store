@@ -21,8 +21,8 @@ class UserFormRequest extends FormRequest
             'password'                     => $this->isMethod('post')
                                                 ? 'required|string|min:8|confirmed'
                                                 : 'nullable|string|min:8|confirmed',
-            'type'                         => 'required|in:member,board,employee,pending_member',
-            'blocked'                      => 'required|boolean',
+            'type'                         => 'sometimes|in:member,board,employee,pending_member',
+            'blocked'                      => 'sometimes|boolean',
             'gender'                       => 'required|in:M,F',
             'photo'                         => 'nullable|string',
             'nif'                          => 'nullable|string',

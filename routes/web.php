@@ -103,6 +103,16 @@ Route::resource('departments', DepartmentController::class);
 
 Route::get('cart', [CartController::class, 'show'])->name('cart.show');
 
+//llevar a la vista payment
+Route::get('payment', function () {
+    return view('cart.payment');
+})->middleware('auth')->name('payment');
+
+Route::get('edit', function () {
+    return view('profile.edit');
+})->middleware('auth')->name('edit');
+
+
 // Añadir (o incrementar) items al carrito
 Route::post('cart/{product}', [CartController::class, 'addToCart'])->name('cart.add');
 
@@ -114,6 +124,11 @@ Route::delete('cart/{product}', [CartController::class, 'removeFromCart'])->name
 
 // Vaciar carrito completo
 Route::delete('cart', [CartController::class, 'destroy'])->name('cart.destroy');
+
+//editar perfil
+Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
+
+
 
 
 require __DIR__ . '/auth.php';

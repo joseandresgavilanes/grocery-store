@@ -15,14 +15,24 @@
     </a>
 
 @if(auth()->user()?->photo)
-    <div class="mb-6 flex justify-center">
+    <div class="mb-6 flex flex-col items-center">
         <img
             src="{{auth()->user()->image_url}}"
             alt="Imagen de {{ auth()->user()?->firstLastInitial() }}"
             class="h-24 w-24 object-cover rounded-full border-2 border-zinc-300 dark:border-zinc-600"
         >
+        <div class="mt-2">
+            <a href="{{ route('edit') }}"
+               class="text-sm text-gray-700/70 hover:text-gray-900 dark:text-gray-300/70 dark:hover:text-gray-100
+          border-b border-gray-400/40 dark:border-gray-500/30 hover:border-gray-700 dark:hover:border-gray-300
+          transition duration-150 ease-in-out"
+               wire:navigate>
+                Edit Profile
+            </a>
+        </div>
     </div>
 @endif
+
 
 
     {{-- Catálogo disponible para todos --}}
