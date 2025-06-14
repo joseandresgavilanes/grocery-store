@@ -53,28 +53,29 @@ class CategoryController extends Controller
         return view('categories.edit', compact('category'));
     }
 
-    public function update(CategoryFormRequest $request, Category $category): RedirectResponse
-{
-    $data = $request->validated();
+   public function update(CategoryFormRequest $request, Category $category): RedirectResponse
+    {
+        $data = $request->validated();
 
-    if ($request->hasFile('image')) {
-        $filename = \Str::slug($data['name']) . '.' . $request->file('image')->getClientOriginalExtension();
-        $path = $request->file('image')->storeAs('categories', $filename, 'public');
+        if ($request->hasFile('image')) {
+            $filename = \Str::slug($data['name']) . '.' . $request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('categories', $filename, 'public');
 
-        // Actualiza el nombre de la imagen en $data para que se guarde bien en la DB
-        $data['image'] = $filename;
+            // Actualiza el nombre de la imagen en $data para que se guarde bien en la DB
+            $data['image'] = $filename;
+        }
+
+        // Actualizar con $data que contiene el nombre correcto de la imagen
+        $category->update($data);
+
+        $url = route('categories.show', ['category' => $category]);
+        $msg = "Categoría <a href='$url'><u>{$category->name}</u></a> actualizada correctamente.";
+
+        return redirect()->route('categories.index')
+                        ->with('alert-type', 'success')
+                        ->with('alert-msg', $msg);
     }
 
-    // Actualizar con $data que contiene el nombre correcto de la imagen
-    $category->update($data);
-
-    $url = route('categories.show', ['category' => $category]);
-    $msg = "Categoría <a href='$url'><u>{$category->name}</u></a> actualizada correctamente.";
-
-    return redirect()->route('categories.index')
-                     ->with('alert-type', 'success')
-                     ->with('alert-msg', $msg);
-}
 
     public function destroy(Category $category): RedirectResponse
     {

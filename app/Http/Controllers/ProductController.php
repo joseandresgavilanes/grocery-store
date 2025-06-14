@@ -8,6 +8,7 @@ use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\ProductFormRequest;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -37,8 +38,8 @@ class ProductController extends Controller
 
         // 4) Ordenamiento: sort_by (campo) y sort_dir (asc/desc)
         $allowedSorts = ['name', 'price', 'stock'];
-        $sortBy  = in_array($request->input('sort_by'), $allowedSorts) 
-                      ? $request->input('sort_by') 
+        $sortBy  = in_array($request->input('sort_by'), $allowedSorts)
+                      ? $request->input('sort_by')
                       : 'name';
         $sortDir = $request->input('sort_dir') === 'desc' ? 'desc' : 'asc';
 
@@ -78,7 +79,9 @@ class ProductController extends Controller
 
         $data = $request->validated();
         if ($file = $request->file('photo')) {
-            $data['photo'] = $file->store('products','public');
+            $data['photo'] = $file->storeAs('products', $file->hashName(), 'public');
+            $data['photo'] = $file->hashName(); // Guardas solo el nombre
+
         }
 
         $p = Product::create($data);
@@ -101,20 +104,30 @@ class ProductController extends Controller
      * Actualizar producto.
      */
     public function update(ProductFormRequest $request, Product $product): RedirectResponse
-    {
-        $this->authorize('update', $product);
+{
+    $this->authorize('update', $product);
 
-        $data = $request->validated();
-        if ($file = $request->file('photo')) {
-            // opcional: Storage::disk('public')->delete("products/{$product->photo}");
-            $data['photo'] = $file->store('products','public');
-        }
+    $data = $request->validated();
 
-        $product->update($data);
+    if ($request->hasFile('photo')) {
+        // Generar nombre amigable para la imagen basado en el nombre del producto
+        $filename = Str::slug($data['name']) . '.' . $request->file('photo')->getClientOriginalExtension();
 
-        return redirect()->route('products.admin')
-                         ->with('success',"Producto '{$product->name}' actualizado.");
+        // Guardar la imagen con ese nombre en 'products' dentro del disco 'public'
+        $path = $request->file('photo')->storeAs('products', $filename, 'public');
+
+        // Actualizar el nombre de la foto en los datos para guardar en BD
+        $data['photo'] = $filename;
+
+        // Opcional: eliminar la imagen anterior si quieres evitar acumulación
+        // Storage::disk('public')->delete("products/{$product->photo}");
     }
+
+    $product->update($data);
+
+    return redirect()->route('products.admin')
+                     ->with('success', "Product '{$product->name}' updated.");
+}
 
     /**
      * Eliminar producto (soft o hard según tu implementación).
