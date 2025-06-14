@@ -13,6 +13,19 @@ use App\Models\StockAdjustment;
 
 class OrderController extends Controller
 {
+
+    public function receipt(Order $order)
+{
+    $this->authorize('view', $order);
+    $path = "public/receipts/order-{$order->id}.pdf";
+
+    if (!\Storage::exists($path)) {
+        abort(404);
+    }
+
+    return \Storage::download($path, "recibo-pedido-{$order->id}.pdf");
+}
+
     public function pending()
     {
         $this->authorize('viewAny', Order::class);

@@ -33,4 +33,13 @@ class OrderPolicy
         return $user->isBoard()
             && $order->status === 'pending';
     }
+
+    public function view(User $user, Order $order): bool
+    {
+        if ($user->id === $order->member_id) {
+            return true;
+        }
+
+        return $user->isEmployee() || $user->isBoard();
+    }
 }

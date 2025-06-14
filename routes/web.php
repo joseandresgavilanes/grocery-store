@@ -51,6 +51,15 @@ Route::get('edit', function () {
     return view('profile.edit');
 })->middleware('auth')->name('edit');
 
+Route::middleware(['auth','can:member'])
+     ->get('payment', [CartController::class,'payment'])
+     ->name('payment');
+
+// POST checkout → CartController@checkout (lógica real o dummy)
+Route::middleware(['auth','can:member'])
+     ->post('cart/checkout', [CartController::class,'checkout'])
+     ->name('cart.checkout');
+
 
 // Añadir (o incrementar) items al carrito
 Route::post('cart/{product}', [CartController::class, 'addToCart'])->name('cart.add');
@@ -95,14 +104,13 @@ Route::middleware(['auth'])->group(function(){
     |--------------------------------------------------------------------------
     */
     Route::middleware('can:member')->group(function(){
-        Route::post('cart/checkout',    [CartController::class,'checkout'])->name('cart.checkout');
-        Route::get('card',              [CardController::class,'show'])->name('card.show');
-        Route::post('card/topup',       [CardController::class,'topup'])->name('card.topup');
-        Route::get('orders/history',    [OrderController::class,'history'])->name('orders.history');
         Route::get('stats/my',          [StatsController::class,'myStats'])->name('stats.my');
         Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
-
+        Route::get  ('card',       [CardController::class,'show'])->name('card.show');
+        Route::post ('card/topup', [CardController::class,'topup'])->name('card.topup');
+       
     });
+
 
     /*
     |--------------------------------------------------------------------------
@@ -202,4 +210,9 @@ Route::middleware(['auth'])->group(function(){
         // Estadísticas globales
         Route::get('stats/global', [StatsController::class,'global'])->name('stats.global');
     });
+
+
+    Route::get('orders/{order}/receipt', [OrderController::class, 'receipt'])
+     ->middleware(['auth','can:view,order'])
+     ->name('orders.receipt');
 });

@@ -54,6 +54,19 @@
     </flux:navlist>
 @auth
 
+@can('view', Auth::user()->card)
+    <flux:navlist variant="outline">
+      <flux:navlist.group heading="Mi Tarjeta">
+        <flux:navlist.item
+          icon="credit-card"
+          :href="route('card.show')"
+          :current="request()->routeIs('card.show')"
+          wire:navigate
+        >Tarjeta Virtual</flux:navlist.item>
+      </flux:navlist.group>
+    </flux:navlist>
+  @endcan
+
 @can('viewAny', App\Models\Order::class)
   <flux:navlist variant="outline">
     <flux:navlist.group heading="Pedidos">

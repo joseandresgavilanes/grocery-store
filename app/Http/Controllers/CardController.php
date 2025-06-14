@@ -2,73 +2,62 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Card;
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\CardFormRequest;
+use App\Models\Card;
+use App\Models\Operation;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+use App\Services\Payment;
 
 class CardController extends Controller
 {
-    public function index(): View
+    /**
+     * Muestra el balance, historial de compras y operaciones.
+     */
+    public function show(): View
     {
-        return view('cards.index');
+        $user       = Auth::user();
+        $card       = $user->card;
+        $this->authorize('view', $card);
+
+        // Compras completadas con enlace a su PDF
+        $orders     = $user->orders()
+                           ->where('status', 'completed')
+                           ->orderByDesc('created_at')
+                           ->get();
+
+        // Todas las operaciones de la tarjeta: créditos y débitos
+        $operations = $card->operations()
+                           ->orderByDesc('created_at')
+                           ->get();
+
+        return view('cards.show', compact('card', 'orders', 'operations'));
     }
 
-    public function create(): View
+    /**
+     * Recarga de saldo. Registra una operación de tipo 'credit'.
+     */
+    public function topup(CardFormRequest $request, Payment $payment): RedirectResponse
     {
-        return view('cards.create')->with('card', new Card());
-    }
+        $user   = Auth::user();
+        $card   = $user->card;
+        $amount = $request->validated()['amount'];
 
-    public function store(CardFormRequest $request): RedirectResponse
-    {
-        $card = Card::create($request->validated());
-        $url  = route('cards.show', ['card' => $card]);
-        $msg  = "Tarjeta <a href='$url'><u>{$card->card_number}</u></a> creada correctamente.";
-        return redirect()->route('cards.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
+        // Aquí podrías invocar tu servicio de pago real:
+        $payment->processTopUp($user, $amount);
 
-    public function show(Card $card): View
-    {
-        return view('cards.show', compact('card'));
-    }
+        // Actualizamos balance
+        $card->increment('balance', $amount);
 
-    public function edit(Card $card): View
-    {
-        return view('cards.edit', compact('card'));
-    }
+        // Registramos la operación
+        Operation::create([
+            'card_id'     => $card->id,
+            'type'        => 'credit',
+            'amount'      => $amount,
+            'description' => 'Recarga de saldo',
+        ]);
 
-    public function update(CardFormRequest $request, Card $card): RedirectResponse
-    {
-        $card->update($request->validated());
-        $url  = route('cards.show', ['card' => $card]);
-        $msg  = "Tarjeta <a href='$url'><u>{$card->card_number}</u></a> actualizada correctamente.";
-        return redirect()->route('cards.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
-
-    public function destroy(Card $card): RedirectResponse
-    {
-        try {
-            if ($card->transactions()->count() === 0) {
-                $card->delete();
-                $type = 'success';
-                $msg  = "Tarjeta {$card->card_number} eliminada correctamente.";
-            } else {
-                $type = 'warning';
-                $cnt  = $card->transactions()->count();
-                $msg  = "La tarjeta {$card->card_number} no puede borrarse porque tiene $cnt transacciones.";
-            }
-        } catch (\Exception $e) {
-            $type = 'danger';
-            $msg  = "Error al eliminar la tarjeta {$card->card_number}.";
-        }
-
-        return redirect()->back()
-                         ->with('alert-type', $type)
-                         ->with('alert-msg', $msg);
+        return back()->with('success', "Saldo recargado: +€{$amount}");
     }
 }
