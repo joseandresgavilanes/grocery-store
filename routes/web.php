@@ -73,9 +73,12 @@ Route::delete('cart', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::get('/estadisticas', [StatsController::class, 'index'])->name('stats.index');
 Route::get('/stats/export', [StatsController::class, 'export'])->name('stats.export');
 
-//link para el updateAdmin
+
 Route::put('/admin/users/{user}', [UserController::class, 'updateAdmin'])->name('users.updateAdmin');
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
@@ -109,7 +112,7 @@ Route::middleware(['auth'])->group(function(){
         Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
         Route::get  ('card',       [CardController::class,'show'])->name('card.show');
         Route::post ('card/topup', [CardController::class,'topup'])->name('card.topup');
-       
+
     });
 
 

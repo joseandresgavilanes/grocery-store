@@ -1,57 +1,34 @@
-<x-layouts.main-content title="Department of Computer Engineering"
-                        heading="Introduction">
+<x-layouts.main-content title="Grocery-store"
+                        heading="Grocery-store">
 
     <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="my-4 p-6 bg-zinc-50   border border-zinc-200 dark:bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg text-gray-900 dark:text-gray-50">
-            <h3 class="pb-3 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-5">
-                Department of Computer Engineering
-            </h3>
-            <p class="py-3 text-sm font-light leading-7 text-gray-700 dark:text-gray-300">
-                The Department of Computer Engineering was formally created in 1997 with the approval of
-                the Statutes of the
-                School of Technology and Management (Escola Superior de Tecnologia e Gestão - ESTG),
-                but its origins lie in the area of Computer Science that has existed at ESTG
-                since it began operating in the 1989/90 academic year.
-            </p>
-            <p class="py-3 text-sm font-light leading-7 text-gray-700 dark:text-gray-300">
-                The Department of Computer Engineering is a functional unit of the ESTG to which
-                teachers,
-                laboratories and support services related to the teaching of
-                computer engineering are assigned.
-                The Department of Computer Engineering is responsible for a number of undergraduate,
-                master's and postgraduate
-                courses, as well as the recently created Higher Professional Technical Courses. It is
-                also responsible for teaching
-                various curricular units in the area of Computer Science that are part of the curriculum
-                of other courses taught at
-                ESTG. The activities carried out by the the Department of Computer Engineering follow
-                the strategic guidelines
-                defined by ESTG's bodies (Scientific Council, Pedagogical Council and Management).
-            </p>
-            <p class="py-3 text-sm font-light leading-7 text-gray-700 dark:text-gray-300">
-                The Master's course in Computer Engineering - Mobile Computing has been recognized by
-                ENAEE (European Network for
-                Accreditation of Engineering Education) through the award of the EUR-ACE® Quality Mark.
-                The distinction places the
-                quality of teaching in this course at the Polytechnic of Leiria at the level of the best
-                European universities and
-                polytechnics, and confirms the international dimension of the School's diplomas,
-                encouraging greater acceptance of
-                engineers graduating from the Polytechnic of Leiria throughout Europe.
+
+        <div class="mb-8 p-8 bg-zinc-50 dark:bg-gray-900 border border-zinc-200 shadow-md sm:rounded-lg text-gray-900 dark:text-gray-50">
+            <h2 class="text-3xl font-bold mb-4 text-gray-800 dark:text-gray-100">Welcome to Grocery-store</h2>
+            <p class="text-sm font-light text-gray-700 dark:text-gray-300">
+                Your one-stop shop for fresh groceries, daily essentials, and amazing deals. Explore our departments and enjoy unbeatable freshness and quality.
             </p>
         </div>
-        <div class="my-8 p-6 bg-zinc-50   border border-zinc-200 dark:bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg text-gray-900 dark:text-gray-50">
-            <h3 class="pb-3 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-5">
-                Organization
-            </h3>
-            <p class="py-3 text-sm font-light leading-7 text-gray-700 dark:text-gray-300">
-                The organization of the Department of Computer Engineering is defined by the ESTG
-                statutes as follows:
-            <ul class="list-disc ms-12">
-                <li class="py-1 text-sm font-light leading-7 text-gray-700 dark:text-gray-300">Coordinator;</li>
-                <li class="py-1 text-sm font-light leading-7 text-gray-700 dark:text-gray-300">Department Council;</li>
-                <li class="py-1 text-sm font-light leading-7 text-gray-700 dark:text-gray-300">Plenary.</li>
+
+
+
+        <div class="mb-8 p-6 bg-zinc-50 dark:bg-gray-900 border border-zinc-200 shadow-sm sm:rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">This Week's Deals</h3>
+            <ul class="list-disc ms-6 text-sm font-light text-gray-700 dark:text-gray-300">
+                <li class="py-1">Buy 1 Get 1 Free - Fresh Strawberries</li>
+                <li class="py-1">20% off on All Dairy Products</li>
+                <li class="py-1">Free Delivery on Orders Over $50</li>
             </ul>
+        </div>
+
+
+        <div class="p-6 bg-zinc-50 dark:bg-gray-900 border border-zinc-200 shadow-sm sm:rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">Visit Us</h3>
+            <p class="text-sm font-light text-gray-700 dark:text-gray-300">
+                FreshMart Supermarket<br>
+                123 Market Street, Food City<br>
+                Mon–Sat: 8 AM – 9 PM | Sun: 9 AM – 6 PM<br>
+                <span class="font-medium">Phone:</span> (123) 456-7890
             </p>
         </div>
     </div>
