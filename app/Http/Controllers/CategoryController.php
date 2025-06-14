@@ -23,13 +23,25 @@ class CategoryController extends Controller
 
     public function store(CategoryFormRequest $request): RedirectResponse
     {
-        $cat = Category::create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $filename = \Str::slug($data['name']) . '.' . $request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('categories', $filename, 'public');
+            $data['image'] = $filename;
+        }
+
+        $cat = Category::create($data);
+
         $url = route('categories.show', ['category' => $cat]);
-        $msg = "Categoría <a href='$url'><u>{$cat->name}</u></a> creada correctamente.";
+        $msg = "Category <a href='$url'><u>{$cat->name}</u></a> created successfully.";
+
         return redirect()->route('categories.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
+                        ->with('alert-type', 'success')
+                        ->with('alert-msg', $msg);
     }
+
+
 
     public function show(Category $category): View
     {
@@ -42,14 +54,27 @@ class CategoryController extends Controller
     }
 
     public function update(CategoryFormRequest $request, Category $category): RedirectResponse
-    {
-        $category->update($request->validated());
-        $url = route('categories.show', ['category' => $category]);
-        $msg = "Categoría <a href='$url'><u>{$category->name}</u></a> actualizada correctamente.";
-        return redirect()->route('categories.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
+{
+    $data = $request->validated();
+
+    if ($request->hasFile('image')) {
+        $filename = \Str::slug($data['name']) . '.' . $request->file('image')->getClientOriginalExtension();
+        $path = $request->file('image')->storeAs('categories', $filename, 'public');
+
+        // Actualiza el nombre de la imagen en $data para que se guarde bien en la DB
+        $data['image'] = $filename;
     }
+
+    // Actualizar con $data que contiene el nombre correcto de la imagen
+    $category->update($data);
+
+    $url = route('categories.show', ['category' => $category]);
+    $msg = "Categoría <a href='$url'><u>{$category->name}</u></a> actualizada correctamente.";
+
+    return redirect()->route('categories.index')
+                     ->with('alert-type', 'success')
+                     ->with('alert-msg', $msg);
+}
 
     public function destroy(Category $category): RedirectResponse
     {
