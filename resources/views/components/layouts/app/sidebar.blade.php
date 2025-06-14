@@ -21,15 +21,7 @@
             alt="Imagen de {{ auth()->user()?->firstLastInitial() }}"
             class="h-24 w-24 object-cover rounded-full border-2 border-zinc-300 dark:border-zinc-600"
         >
-        <div class="mt-2">
-            <a href="{{ route('edit') }}"
-               class="text-sm text-gray-700/70 hover:text-gray-900 dark:text-gray-300/70 dark:hover:text-gray-100
-          border-b border-gray-400/40 dark:border-gray-500/30 hover:border-gray-700 dark:hover:border-gray-300
-          transition duration-150 ease-in-out"
-               wire:navigate>
-                Edit Profile
-            </a>
-        </div>
+
     </div>
 @endif
 
@@ -115,8 +107,8 @@
                     :current="request()->routeIs('products.admin.*')"
                     wire:navigate
                 >Productos</flux:navlist.item>
-                
-             
+
+
                 <flux:navlist.item
                     icon="chart-bar"
                     :href="route('stats.global')"
@@ -157,7 +149,7 @@
     </flux:navlist.group>
   </flux:navlist>
 @endcan
-            
+
             </flux:navlist.group>
         </flux:navlist>
         @endcan
@@ -177,7 +169,7 @@
                 </div>
                 <flux:menu.separator/>
                 <flux:menu.item
-                    :href="route('settings.profile')"
+                    href="{{ route('edit') }}"
                     icon="cog"
                     wire:navigate
                 >Settings</flux:menu.item>
@@ -209,7 +201,7 @@
     @endauth
 </flux:sidebar>
 
-        <!-- Mobile User Menu -->        
+        <!-- Mobile User Menu -->
         <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 

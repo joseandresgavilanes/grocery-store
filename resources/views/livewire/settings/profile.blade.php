@@ -28,38 +28,38 @@ new class extends Component {
     /**
      * Update the profile information for the currently authenticated user.
      */
-    public function updateProfileInformation(): void
-    {
-        $user = Auth::user();44
+   public function updateProfileInformation(): void
+{
+    $user = Auth::user();
 
-        $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
+    $validated = $this->validate([
+        'name' => ['required', 'string', 'max:255'],
 
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($user->id)
-            ],
+        'email' => [
+            'required',
+            'string',
+            'lowercase',
+            'email',
+            'max:255',
+            Rule::unique(User::class)->ignore($user->id),
+        ],
 
-            'nif' = 'nullable|string|digits:9'
-            'default_delivery_address' = 'nullable|string|max:255'
-            'default_payment_type' = 'nullable|in:PayPal,MB_WAY|Visa'
+        'nif' => 'nullable|string|digits:9',
+        'default_delivery_address' => 'nullable|string|max:255',
+        'default_payment_type' => 'nullable|in:PayPal,MB_WAY,Visa',
+    ]);
 
-        ]);
+    $user->fill($validated);
 
-        $user->fill($validated);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        $user->save();
-
-        $this->dispatch('profile-updated', name: $user->name);
+    if ($user->isDirty('email')) {
+        $user->email_verified_at = null;
     }
+
+    $user->save();
+
+    $this->dispatch('profile-updated', name: $user->name);
+}
+
 
     /**
      * Send an email verification notification to the current user.
