@@ -135,6 +135,8 @@ Route::middleware(['auth'])->group(function(){
          ->post('inventory/{product}/adjust', [StockAdjustmentController::class,'store'])
          ->name('inventory.adjust');
 
+    // Ajuste manual de stock
+    Route::post('/inventory/{product}/adjust', [InventoryController::class, 'adjust'])->name('inventory.adjust');
 
     /*
     |--------------------------------------------------------------------------
