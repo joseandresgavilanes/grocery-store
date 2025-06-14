@@ -9,39 +9,21 @@ class InventoryController extends Controller
 
     public function index(Request $request)
     {
-        // Todos los productos, con opción de filtrar
         $query = Product::query();
+
         if ($request->filled('filter') && $request->filter === 'out_of_stock') {
             $query->where('stock', '<=', 0);
-        } elseif ($request->filled('filter') && $request->filter === 'low_stock') {
+        }
+
+        if ($request->filled('filter') && $request->filter === 'low_stock') {
             $query->whereColumn('stock', '<', 'stock_lower_limit');
         }
-        $products = $query->orderBy('name')->get();
+
+        $products = $query->orderBy('name')->paginate(20)->withQueryString();
+
         return view('inventory.index', compact('products'));
     }
 
-
-    // public function index(Request $request)
-    // {
-    //     $query = Product::query();
-
-    //     // filtro “sin stock”
-    //     if ($request->filled('filter') && $request->filter==='out_of_stock') {
-    //         $query->where('stock', 0);
-    //     }
-
-    //     // filtro “debajo mínimo”
-    //     if ($request->filled('filter') && $request->filter==='below_min') {
-    //         $query->whereColumn('stock','<','stock_min_qty');
-    //     }
-
-    //     $products = $query->paginate(20)
-    //         ->withQueryString();
-
-    //     return view('inventory.index', compact('products'));
-    // }
-
-    /** genera supply-orders automáticos hasta stock_max */
     public function autoReorder()
     {
         $toReorder = Product::whereColumn('stock','<','stock_min_qty')->get();
@@ -58,5 +40,21 @@ class InventoryController extends Controller
         return back()
             ->with('alert-type','success')
             ->with('alert-msg','Supply orders auto generados');
+    }
+
+    public function adjust(Request $request, Product $product)
+    {
+    $max = $product->stock_upper_limit;
+
+    $validated = $request->validate([
+        'new_stock' => ['required', 'integer', 'min:0', "max:$max"],
+    ], [
+        'new_stock.max' => "El stock no puede superar el límite máximo de $max unidades.",
+    ]);
+
+    $product->stock = $validated['new_stock'];
+    $product->save();
+
+    return redirect()->back()->with('alert-msg', 'Stock actualizado correctamente.');
     }
 }
