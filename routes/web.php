@@ -41,9 +41,8 @@ Route::get('products/{product}', [ProductController::class,'show'])->name('produ
 Route::get('cart',                   [CartController::class,'show'])->name('cart.show');
 
 //llevar a la vista payment
-Route::get('payment', function () {
-    return view('cart.payment');
-})->middleware('auth')->name('payment');
+Route::get('payment', [CartController::class, 'payment'])->middleware('auth')->name('payment');
+
 
 Route::get('edit', function () {
     return view('profile.edit');
