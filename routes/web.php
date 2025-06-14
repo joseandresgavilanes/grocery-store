@@ -17,7 +17,9 @@ use App\Http\Controllers\{
     StatsController,
     CourseController,
     DisciplineController,
-    DepartmentController
+    DepartmentController,
+    SettingsController,
+    SettingsShippingCostsController
 };
 use App\Models\{Order, Product, SupplyOrder, StockAdjustment, User};
 
@@ -178,15 +180,20 @@ Route::middleware(['auth'])->group(function(){
         Route::post('users/{user}/promote', [UserController::class,'promote'])->name('users.promote');
         Route::post('users/{user}/demote',  [UserController::class,'demote'])->name('users.demote');
 
+
+        // Cuota de membresía
+          Route::get ('settings/edit',    [SettingsController::class,'edit'])  ->name('settings.edit');
+          Route::put ('settings',         [SettingsController::class,'update'])->name('settings.update');
+        // Tramos de envio
+
+        Route::resource('shipping_costs', SettingsShippingCostsController::class);
+          
+
         // Ajustes de negocio
         Route::resource('categories', CategoryController::class);
         // Gestión de productos (solo CRUD panel)
         Route::resource('products', ProductController::class)->except(['index','show']);
         Route::get('products/admin', [ProductController::class,'adminIndex'])->middleware('can:viewAny,'.Product::class)->name('products.admin');
-        // Ajustes de membresía y envío
-        Route::resource('settings', SettingController::class)->only(['index','update']);
-        Route::post('settings/shipping', [ShippingCostController::class,'update'])
-             ->name('settings.shipping.update');
 
         // Estadísticas globales
         Route::get('stats/global', [StatsController::class,'global'])->name('stats.global');

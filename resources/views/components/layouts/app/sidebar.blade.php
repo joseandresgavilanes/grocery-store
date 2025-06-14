@@ -137,6 +137,26 @@
                 </flux:navlist.group>
             </flux:navlist>
 
+
+            @can('view', App\Models\Settings::class)
+  <flux:navlist variant="outline">
+    <flux:navlist.group heading="Ajustes de Negocio">
+      <flux:navlist.item
+        icon="credit-card"
+        :href="route('settings.edit')"
+        :current="request()->routeIs('settings.*')"
+        wire:navigate
+      >Cuota Membresía</flux:navlist.item>
+
+      <flux:navlist.item
+        icon="truck"
+        :href="route('shipping_costs.index')"
+        :current="request()->routeIs('shipping_costs.*')"
+        wire:navigate
+      >Costes Envío</flux:navlist.item>
+    </flux:navlist.group>
+  </flux:navlist>
+@endcan
             
             </flux:navlist.group>
         </flux:navlist>

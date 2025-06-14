@@ -1,11 +1,10 @@
-
 <?php
 
 namespace App\Policies;
 
 use App\Models\User;
 
-class SettingPolicy
+class SettingsPolicy
 {
     public function view(User $user): bool
     {

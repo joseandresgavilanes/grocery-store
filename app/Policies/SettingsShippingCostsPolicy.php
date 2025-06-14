@@ -1,5 +1,4 @@
 <?php
-// app/Policies/SettingsShippingCostsPolicy.php
 
 namespace App\Policies;
 
