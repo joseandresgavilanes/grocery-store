@@ -22,7 +22,7 @@
             @method('PUT')
 
             <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <!-- Current image -->
+
                 @if ($category->image_url)
                     <div class="w-full md:w-1/3">
                         <img src="{{ $category->image_url }}"
@@ -31,7 +31,7 @@
                     </div>
                 @endif
 
-                <!-- Name and image fields -->
+
                 <div class="w-full md:w-2/3 space-y-4">
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>

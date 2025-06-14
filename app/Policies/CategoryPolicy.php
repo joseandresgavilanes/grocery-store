@@ -25,7 +25,7 @@ class CategoryPolicy
     }
     public function delete(User $user, Category $category): bool
     {
-        // permitimos soft-delete siempre: el controller se encarga de forzar soft si hay productos
+
         return $user->isBoard();
     }
 }

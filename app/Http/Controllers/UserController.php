@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\UserFormRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -50,15 +52,15 @@ class UserController extends Controller
 
     public function update(UserFormRequest $request): RedirectResponse
     {
-        $user = $request->user(); // o auth()->user()
+        $user = $request->user();
 
         $validated = $request->validated();
         $updateData = [];
 
-        // Recorremos los campos validados y comparamos
+
         foreach ($validated as $key => $value) {
             if ($key === 'password') {
-                // Solo si se proporcionó y es diferente (asumiendo que la contraseña nunca se devuelve plana)
+
                 if (!empty($value)) {
                     $updateData[$key] = bcrypt($value);
                 }
@@ -67,17 +69,14 @@ class UserController extends Controller
             }
         }
 
-        // Foto de perfil (si se sube una nueva)
+
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('users', 'public');
-            $filename = basename($path); // Obtiene solo "abc123.jpg"
+            $filename = basename($path);
             $updateData['photo'] = $filename;
 
         }
 
-
-
-        // Solo actualiza si hay algo nuevo
         if (!empty($updateData)) {
             $user->update($updateData);
         }
@@ -87,33 +86,39 @@ class UserController extends Controller
             ->with('alert-msg', 'Perfil actualizado correctamente.');
     }
 
+    public function updateAdmin(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'gender' => 'nullable|in:M,F',
+            'delivery_address' => 'nullable|string|max:255',
+            'nif' => 'nullable|string|max:20',
+            'payment_details' => 'nullable|string|max:255',
+            'photo' => 'nullable|image|max:2048',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
 
-    // public function destroy(User $user): RedirectResponse
-    // {
-    //     try {
-    //         $orders   = $user->orders()->count();
-    //         $txns     = $user->transactions()->count();
-    //         if ($orders === 0 && $txns === 0) {
-    //             $user->delete();
-    //             $type = 'success';
-    //             $msg  = "Usuario {$user->name} eliminado correctamente.";
-    //         } else {
-    //             $type = 'warning';
-    //             $parts = [];
-    //             if ($orders > 0) $parts[] = "$orders pedidos";
-    //             if ($txns   > 0) $parts[] = "$txns transacciones";
-    //             $just = implode(' y ', $parts);
-    //             $msg  = "El usuario {$user->name} no puede borrarse porque tiene $just.";
-    //         }
-    //     } catch (\Exception $e) {
-    //         $type = 'danger';
-    //         $msg  = "Error al eliminar el usuario {$user->name}.";
-    //     }
+        if (empty($validated['password'])) {
+            unset($validated['password']);
+        } else {
+            $validated['password'] = bcrypt($validated['password']);
+        }
 
-    //     return redirect()->back()
-    //                      ->with('alert-type', $type)
-    //                      ->with('alert-msg', $msg);
-    // }
+        $user->update($validated);
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('users', 'public');
+            $user->photo = basename($path);
+            $user->save();
+        }
+
+        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente');
+    }
+
+
+
+
 
     public function block(User $user): RedirectResponse
     {
@@ -151,11 +156,11 @@ class UserController extends Controller
         return back()->with('success', "Privilegios de board revocados para {$user->name}.");
     }
 
-    // Ajusta destroy() para soft delete de miembros (no permitir borrar a ti mismo)
+
     public function destroy(User $user): RedirectResponse
     {
         $this->authorize('delete', $user);
-        $user->delete(); // requiere SoftDeletes en el modelo User
+        $user->delete();
         return back()->with('success', "Membresía de {$user->name} cancelada.");
     }
 }

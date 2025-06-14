@@ -1,5 +1,5 @@
 <x-layouts.main-content title="Pedidos pendientes">
-  
+
   <div class="overflow-x-auto">
     <table class="min-w-full border border-gray-300 rounded-lg overflow-hidden">
       <thead class="bg-gray-100">
@@ -19,7 +19,7 @@
             <td class="px-4 py-3 border-b border-gray-200 text-gray-800 text-sm">{{ $order->created_at->format('Y-m-d') }}</td>
             <td class="px-4 py-3 border-b border-gray-200 text-gray-800 text-sm text-right">{{ number_format($order->total, 2, ',', '.') }} €</td>
             <td class="px-4 py-3 border-b border-gray-200 text-center space-x-2 flex justify-center">
-              {{-- Botón Completar --}}
+
               <form action="{{ route('orders.complete', $order) }}" method="POST" class="inline">
                 @csrf
                 <button type="submit"
@@ -29,7 +29,7 @@
                 </button>
               </form>
 
-              {{-- Botón Cancelar (solo board) --}}
+
               @can('cancel', $order)
                 <form action="{{ route('orders.cancel', $order) }}" method="POST" class="inline">
                   @csrf

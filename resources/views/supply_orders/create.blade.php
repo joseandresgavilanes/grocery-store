@@ -20,14 +20,12 @@
               @error('items.' . $product->id) border-red-500 @enderror"
           >
         </div>
-        {{-- Mostrar error específico por producto --}}
         @error('items.' . $product->id)
           <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
         @enderror
       </div>
     @endforeach
 
-    {{-- Paginación --}}
     <div class="pt-2">
       {{ $products->links('vendor.pagination.tailwind') }}
     </div>

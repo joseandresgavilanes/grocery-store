@@ -1,10 +1,10 @@
-<x-layouts.main-content title="Editar Usuario">
+<x-layouts.main-content title="Edit User">
     <div class="max-w-3xl mx-auto mt-10 bg-white dark:bg-gray-900 shadow-md rounded-lg p-6 space-y-6">
         <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Edit User</h2>
 
         @if ($errors->any())
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <strong class="font-bold">Errores:</strong>
+                <strong class="font-bold">Errors:</strong>
                 <ul class="mt-2 list-disc list-inside text-sm">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -13,12 +13,12 @@
             </div>
         @endif
 
-        <form action="{{ route('users.update', $user) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ route('users.updateAdmin', $user) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
 
             <div>
-                <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+                <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
                 <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 @error('name')
@@ -35,7 +35,6 @@
                 @enderror
             </div>
 
-            <!-- Gender -->
             <div>
                 <label for="gender" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
                 <select id="gender" name="gender"
@@ -49,7 +48,7 @@
             @if ($user->type !== 'employee')
                 <div>
                     <label for="delivery_address"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dirección de entrega</label>
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Delivery Address</label>
                     <input type="text" id="delivery_address" name="delivery_address"
                         value="{{ old('delivery_address', $user->delivery_address) }}"
                         class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -67,25 +66,15 @@
                     @enderror
                 </div>
 
-                <div>
-                    <label for="payment_details"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Detalles de pago</label>
-                    <input type="text" id="payment_details" name="payment_details"
-                        value="{{ old('payment_details', $user->payment_details) }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    @error('payment_details')
-                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+
             @endif
 
             <div>
-                <label for="photo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Foto de perfil
-                    (opcional)</label>
+                <label for="photo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Photo (optional)</label>
                 <input type="file" id="photo" name="photo" accept="image/*"
                     class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300 file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-200 file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4">
                 @if ($user->photo)
-                    <img src="{{ $user->image_url }}" alt="Foto de {{ $user->name }}"
+                    <img src="{{ $user->image_url }}" alt="{{ $user->name }}'s photo"
                         class="h-24 w-24 object-cover rounded mt-2">
                 @endif
                 @error('photo')
@@ -94,9 +83,8 @@
             </div>
 
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nueva
-                    contraseña (opcional)</label>
-                <input type="password" id="password" name="password" placeholder="Dejar en blanco para no cambiar"
+                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password (optional)</label>
+                <input type="password" id="password" name="password" placeholder="Leave blank to keep current password"
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 @error('password')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -105,16 +93,16 @@
 
             <div>
                 <label for="password_confirmation"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirmar contraseña</label>
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
                 <input type="password" id="password_confirmation" name="password_confirmation"
-                    placeholder="Repite la contraseña"
+                    placeholder="Repeat the password"
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
 
             <div class="flex justify-end mt-6">
                 <button type="submit"
                     class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Guardar cambios
+                    Save Changes
                 </button>
             </div>
         </form>

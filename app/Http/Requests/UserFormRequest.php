@@ -13,7 +13,7 @@ class UserFormRequest extends FormRequest
 
     public function rules(): array
 {
-    $userId = $this->user()->id; // Usa el ID del usuario autenticado
+    $userId = $this->user()->id;
 
     return [
         'name'                         => 'required|string|max:255',

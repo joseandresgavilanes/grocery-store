@@ -8,17 +8,15 @@
 
       {{-- Imagen centrada --}}
       <div class="w-full flex items-center justify-center pt-4 px-4">
-        <img 
-          src="{{ $product->image_url }}" 
-          alt="Imagen de {{ $product->name }}" 
+        <img
+          src="{{ $product->image_url }}"
+          alt="Imagen de {{ $product->name }}"
           class="h-48 w-full object-cover rounded-lg"
         >
       </div>
 
-      {{-- Bloque de info dentro del enlace --}}
       <figcaption class="p-4">
 
-        {{-- Nombre y categoría --}}
         <div class="mb-2">
           <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 leading-tight">
             {{ $product->name }}
@@ -28,7 +26,6 @@
           </span>
         </div>
 
-        {{-- Precio y descuento --}}
         <div class="mb-2 flex items-center space-x-2">
           @if($product->discount && $product->discount_min_qty)
             <span class="text-gray-400 dark:text-gray-600 line-through text-sm">
@@ -50,7 +47,6 @@
           @endif
         </div>
 
-        {{-- Opcional: puntuación --}}
         @if(isset($product->rating))
           <div class="flex items-center mb-2">
             @for($i = 1; $i <= 5; $i++)
@@ -70,12 +66,10 @@
           </div>
         @endif
 
-        {{-- Descripción breve --}}
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
           {{ Str::limit($product->description, 100) }}
         </p>
 
-        {{-- Badge stock --}}
         @if($product->stock === 0)
           <span class="inline-block mb-2 px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs font-semibold rounded-full">
             Sin stock (llegada tardía posible)
@@ -89,8 +83,7 @@
       </figcaption>
     </a>
 
-    {{-- Formulario Añadir al carrito fuera del enlace --}}
-    <form 
+    <form
       action="{{ route('cart.add', ['product' => $product->id]) }}"
       method="POST"
       class="mt-auto pt-2 border-t border-gray-100 dark:border-gray-700 px-4"
@@ -99,17 +92,17 @@
       <div class="flex items-center space-x-2 mt-2">
         <div class="w-20">
           <label for="quantity-{{ $product->id }}" class="sr-only">Cantidad</label>
-          <input 
+          <input
             id="quantity-{{ $product->id }}"
-            name="quantity" 
-            type="number" 
-            min="1" 
-            value="1" 
+            name="quantity"
+            type="number"
+            min="1"
+            value="1"
             class="w-full border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-center
                    focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-900 dark:text-gray-200"
           >
         </div>
-        <button 
+        <button
           type="submit"
           class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700
                  text-white font-medium rounded focus:outline-none focus:ring-2 focus:ring-blue-400

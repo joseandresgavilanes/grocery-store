@@ -9,7 +9,7 @@
 >
     <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-    {{-- Logo / Inicio --}}
+
     <a href="{{ route('home') }}" class="mb-6 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
         <x-app-logo />
     </a>
@@ -27,7 +27,7 @@
 
 
 
-    {{-- Catálogo disponible para todos --}}
+
     <flux:navlist variant="outline">
         <flux:navlist.group heading="Catálogo">
             <flux:navlist.item
@@ -84,7 +84,7 @@
     </flux:navlist.group>
   </flux:navlist>
 @endcan
-        {{-- Órdenes de suministro (empleados & board) --}}
+
         @can('viewAny', App\Models\SupplyOrder::class)
         <flux:navlist variant="outline">
             <flux:navlist.group heading="Reposición">
@@ -98,7 +98,7 @@
         </flux:navlist>
         @endcan
 
-        {{-- Administración de plataforma (solo board) --}}
+
         @can('viewAny', App\Models\User::class)
         <flux:navlist variant="outline">
             <flux:navlist.group heading="Administración">
@@ -120,14 +120,6 @@
                     :current="request()->routeIs('products.admin.*')"
                     wire:navigate
                 >Productos</flux:navlist.item>
-
-
-                <flux:navlist.item
-                    icon="chart-bar"
-                    :href="route('stats.global')"
-                    :current="request()->routeIs('stats.global')"
-                    wire:navigate
-                >Estadísticas</flux:navlist.item>
 
                 <flux:navlist variant="outline">
                 <flux:navlist.group heading="Estadísticas">
@@ -167,7 +159,7 @@
         </flux:navlist>
         @endcan
 
-        {{-- Menú de usuario autenticado al pie --}}
+
         <flux:spacer/>
         <flux:dropdown position="bottom" align="start">
             <flux:profile
@@ -199,7 +191,7 @@
         </flux:dropdown>
 
     @else
-        {{-- Enlaces de login para invitados --}}
+
         <flux:spacer/>
         <flux:navlist variant="outline">
             <flux:navlist.group heading="Authentication">
@@ -214,7 +206,6 @@
     @endauth
 </flux:sidebar>
 
-        <!-- Mobile User Menu -->
         <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 

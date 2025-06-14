@@ -3,28 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Services\CardService;
+use App\Models\Operation;
+use App\Services\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderCompleted;
-use PDF;
 use App\Models\StockAdjustment;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
 
-    public function receipt(Order $order)
+public function receipt(Order $order)
 {
-    $this->authorize('view', $order);
-    $path = "public/receipts/order-{$order->id}.pdf";
+    $this->authorize('view', $order); // Lo mantenemos para seguridad
 
-    if (!\Storage::exists($path)) {
-        abort(404);
-    }
+    $pdf = Pdf::loadView('pdf.receipt', compact('order'));
 
-    return \Storage::download($path, "recibo-pedido-{$order->id}.pdf");
+    return $pdf->download("recibo-pedido-{$order->id}.pdf");
 }
+
+public function cancel(Order $order)
+    {
+        $this->authorize('cancel', $order);
+
+        $order->status = 'canceled';
+        $order->save();
+
+        $card = $order->member->card;
+        $card->increment('balance', $order->total);
+
+        Operation::create([
+            'card_id'           => $card->id,
+            'order_id'          => $order->id,
+            'type'              => 'credit',
+            'value'             => $order->total,
+            'date'              => now()->toDateString(),
+            'debit_type'        => null,
+            'credit_type'       => 'order_cancellation',
+            'payment_type'      => null,
+            'payment_reference' => null,
+            'custom'            => null,
+        ]);
+
+        return redirect()->route('orders.pending')
+                         ->with('success', "Pedido #{$order->id} cancelado y reembolsado.");
+    }
 
     public function pending()
     {
@@ -42,16 +67,16 @@ class OrderController extends Controller
     {
         $this->authorize('complete', $order);
 
-        // 1) Actualizar estado
+
         $order->status ='completed';
         $order->save();
 
-        // 2) Generar PDF
+
         $pdf = PDF::loadView('orders.receipt', compact('order'));
         $path = "receipts/order-{$order->id}.pdf";
         Storage::put("public/{$path}", $pdf->output());
 
-        // 3) Actualizar stock y registrar ajustes
+
         foreach ($order->items as $item) {
             $product = $item->product;
             $old = $product->stock;
@@ -66,7 +91,7 @@ class OrderController extends Controller
             ]);
         }
 
-        // 4) Enviar email con recibo
+
         Mail::to($order->member->email)
             ->send(new OrderCompleted($order, $path));
 
@@ -74,18 +99,5 @@ class OrderController extends Controller
                          ->with('success', "Pedido #{$order->id} marcado como completado.");
     }
 
-    public function cancel(Order $order, CardService $card)
-    {
-        $this->authorize('cancel', $order);
 
-        // 1) Cambiar estado
-        $order->status = 'canceled';
-        $order->save();
-
-        // 2) Reembolsar
-        $card->refund($order->member->card, $order->total);
-
-        return redirect()->route('orders.pending')
-                         ->with('success', "Pedido #{$order->id} cancelado y reembolsado.");
-    }
 }

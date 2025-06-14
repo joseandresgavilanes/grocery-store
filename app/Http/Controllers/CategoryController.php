@@ -61,11 +61,11 @@ class CategoryController extends Controller
             $filename = \Str::slug($data['name']) . '.' . $request->file('image')->getClientOriginalExtension();
             $path = $request->file('image')->storeAs('categories', $filename, 'public');
 
-            // Actualiza el nombre de la imagen en $data para que se guarde bien en la DB
+
             $data['image'] = $filename;
         }
 
-        // Actualizar con $data que contiene el nombre correcto de la imagen
+
         $category->update($data);
 
         $url = route('categories.show', ['category' => $category]);

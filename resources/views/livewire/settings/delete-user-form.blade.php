@@ -7,9 +7,7 @@ use Livewire\Volt\Component;
 new class extends Component {
     public string $password = '';
 
-    /**
-     * Delete the currently authenticated user.
-     */
+
     public function deleteUser(Logout $logout): void
     {
         $this->validate([

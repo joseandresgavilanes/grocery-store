@@ -37,21 +37,21 @@ class Product extends Model
         if ($this->photo && \Storage::disk('public')->exists('products/' . $this->photo)) {
             return asset('storage/products/' . $this->photo);
         }
-    
+
         return asset('storage/products/product_no_image.png');
     }
 
-    // RELACIONES
+
     public function category()
     {
        return $this->belongsTo(Category::class);
     }
-    
+
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }
-    
+
     public function supplyOrderItems()
     {
         return $this->hasMany(SupplyOrderItem::class);
