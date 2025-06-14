@@ -146,23 +146,27 @@ Route::middleware(['auth'])->group(function(){
     | Supply Orders (Employee & Board)
     |--------------------------------------------------------------------------
     */
-    // CRUD básico y auto-generación
-    Route::middleware('can:viewAny,'.SupplyOrder::class)->group(function(){
-        Route::get('supply-orders',            [SupplyOrderController::class,'index'])->name('supply-orders.index');
-        Route::get('supply-orders/create',     [SupplyOrderController::class,'create'])->name('supply-orders.create');
-        Route::post('supply-orders',           [SupplyOrderController::class,'store'])->name('supply-orders.store');
-        Route::post('supply-orders/auto',      [SupplyOrderController::class,'autoGenerate'])->name('supply-orders.auto');
-    });
+    // Listar y ver órdenes (permiso 'viewAny')
+     Route::middleware('can:viewAny,' . SupplyOrder::class)->group(function () {
+     Route::get('supply-orders', [SupplyOrderController::class, 'index'])->name('supply-orders.index');
+     });
 
-    // Completar supply order (employee & board)
-    Route::middleware('can:complete,supplyOrder')
-         ->post('supply-orders/{supplyOrder}/complete', [SupplyOrderController::class,'complete'])
-         ->name('supply-orders.complete');
+     // Crear y almacenar órdenes (permiso 'create')
+     Route::middleware('can:create,' . SupplyOrder::class)->group(function () {
+          Route::get('supply-orders/create', [SupplyOrderController::class, 'create'])->name('supply-orders.create');
+          Route::post('supply-orders', [SupplyOrderController::class, 'store'])->name('supply-orders.store');
+          Route::post('supply-orders/autoGenerate', [SupplyOrderController::class, 'autoGenerate'])->name('supply-orders.autoGenerate');
+     });
 
-    // Eliminar supply order (solo board)
-    Route::middleware('can:delete,supplyOrder')
-         ->delete('supply-orders/{supplyOrder}', [SupplyOrderController::class,'destroy'])
-         ->name('supply-orders.destroy');
+     // Completar una orden específica (permiso 'complete')
+     Route::middleware('can:complete,supplyOrder')->group(function () {
+          Route::post('supply-orders/{supplyOrder}/complete', [SupplyOrderController::class, 'complete'])->name('supply-orders.complete');
+     });
+
+     // Eliminar una orden específica (permiso 'delete')
+     Route::middleware('can:delete,supplyOrder')->group(function () {
+          Route::delete('supply-orders/{supplyOrder}', [SupplyOrderController::class, 'destroy'])->name('supply-orders.destroy');
+     });
 
 
     /*
