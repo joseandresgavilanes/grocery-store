@@ -15,6 +15,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\StatsController;
 
 // Ruta pública de bienvenida
 Route::view('/', 'home')->name('home');
@@ -115,5 +116,7 @@ Route::delete('cart/{product}', [CartController::class, 'removeFromCart'])->name
 // Vaciar carrito completo
 Route::delete('cart', [CartController::class, 'destroy'])->name('cart.destroy');
 
+Route::get('/estadisticas', [StatsController::class, 'index'])->name('stats.index');
+Route::get('/stats/export', [StatsController::class, 'export'])->name('stats.export');
 
 require __DIR__ . '/auth.php';

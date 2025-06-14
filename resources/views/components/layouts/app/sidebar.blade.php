@@ -14,17 +14,6 @@
         <x-app-logo />
     </a>
 
-@if(auth()->user()?->photo)
-    <div class="mb-6 flex justify-center">
-        <img
-            src="{{auth()->user()->image_url}}"
-            alt="Imagen de {{ auth()->user()?->firstLastInitial() }}"
-            class="h-24 w-24 object-cover rounded-full border-2 border-zinc-300 dark:border-zinc-600"
-        >
-    </div>
-@endif
-
-
     {{-- Catálogo disponible para todos --}}
     <flux:navlist variant="outline">
         <flux:navlist.group heading="Catálogo">
@@ -46,7 +35,7 @@
     @auth
         {{-- Pedidos: empleados y board solo ven pedidos pendientes --}}
         @if(in_array(auth()->user()->type, ['employee','board']))
-
+        
         @can('viewAnyPending', App\Models\Order::class)
   <flux:navlist variant="outline">
     <flux:navlist.group heading="Pedidos">
@@ -105,8 +94,22 @@
                         :current="request()->routeIs('categories.*')"
                         wire:navigate
                     >Categorías</flux:navlist.item>
+                  
+                   
+                </flux:navlist.group>
+            </flux:navlist>
 
-
+            {{-- Sección nueva: Estadísticas --}}
+            <flux:navlist variant="outline">
+                <flux:navlist.group heading="Estadísticas">
+                    <flux:navlist.item
+                        icon="chart-bar"
+                        :href="route('stats.index')"
+                        :current="request()->routeIs('stats.index')"
+                        wire:navigate
+                    >
+                        Ventas por producto
+                    </flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
         @endif
@@ -127,7 +130,6 @@
                         <br>
                         <span class="text-xs">{{ auth()->user()->email }}</span>
                     </div>
-
                 </flux:menu.radio.group>
                 <flux:menu.separator/>
                 <flux:menu.radio.group>
@@ -164,7 +166,7 @@
     @endauth
 </flux:sidebar>
 
-        <!-- Mobile User Menu -->
+        <!-- Mobile User Menu -->        
         <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
