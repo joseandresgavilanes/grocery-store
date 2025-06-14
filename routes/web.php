@@ -34,22 +34,28 @@ Route::view('/', 'home')->name('home');
 
 // Catálogo público
 Route::get('products',               [ProductController::class,'index'])->name('products.index');
-Route::get('products/{product}', [ProductController::class,'show'])
-     ->whereNumber('product')
-     ->name('products.show');
+Route::get('products/{product}', [ProductController::class,'show'])->name('products.show');
 
 
 // Carrito público (mostrar)
 Route::get('cart',                   [CartController::class,'show'])->name('cart.show');
 
 //llevar a la vista payment
-Route::get('payment', function () {
-    return view('cart.payment');
-})->middleware('auth')->name('payment');
+Route::get('payment', [CartController::class, 'payment'])->middleware('auth')->name('payment');
+
 
 Route::get('edit', function () {
     return view('profile.edit');
 })->middleware('auth')->name('edit');
+
+Route::middleware(['auth','can:member'])
+     ->get('payment', [CartController::class,'payment'])
+     ->name('payment');
+
+// POST checkout → CartController@checkout (lógica real o dummy)
+Route::middleware(['auth','can:member'])
+     ->post('cart/checkout', [CartController::class,'checkout'])
+     ->name('cart.checkout');
 
 
 // Añadir (o incrementar) items al carrito
@@ -99,14 +105,13 @@ Route::middleware(['auth'])->group(function(){
     |--------------------------------------------------------------------------
     */
     Route::middleware('can:member')->group(function(){
-        Route::post('cart/checkout',    [CartController::class,'checkout'])->name('cart.checkout');
-        Route::get('card',              [CardController::class,'show'])->name('card.show');
-        Route::post('card/topup',       [CardController::class,'topup'])->name('card.topup');
-        Route::get('orders/history',    [OrderController::class,'history'])->name('orders.history');
         Route::get('stats/my',          [StatsController::class,'myStats'])->name('stats.my');
         Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
-
+        Route::get  ('card',       [CardController::class,'show'])->name('card.show');
+        Route::post ('card/topup', [CardController::class,'topup'])->name('card.topup');
+       
     });
+
 
     /*
     |--------------------------------------------------------------------------
@@ -206,4 +211,10 @@ Route::middleware(['auth'])->group(function(){
         // Estadísticas globales
         Route::get('stats/global', [StatsController::class,'global'])->name('stats.global');
     });
+
+
+    Route::get('orders/{order}/receipt', [OrderController::class, 'receipt'])
+     ->middleware(['auth','can:view,order'])
+     ->name('orders.receipt');
 });
+

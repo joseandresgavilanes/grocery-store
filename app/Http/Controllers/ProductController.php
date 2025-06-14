@@ -48,10 +48,11 @@ class ProductController extends Controller
         return view('products.index', compact('products', 'categories'));
     }
 
-    public function show(Product $product): View
-    {
-        return view('products.show', compact('product'));
-    }
+public function show(Product $product)
+{
+    $product->load('category');
+    return view('products.show', compact('product'));
+}
 
     public function create(): View
     {

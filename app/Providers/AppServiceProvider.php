@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Category::class,      CategoryPolicy::class);
         Gate::policy(SettingsShippingCosts::class,  SettingsShippingCostsPolicy::class);
         Gate::policy(Settings::class, SettingsPolicy::class);
-
+        Gate::policy(Card::class, CardPolicy::class);
 
         Gate::define('member', fn(User $user) =>
             in_array($user->type, ['member', 'board'], true)
