@@ -2,6 +2,11 @@
     <div class="flex flex-col space-y-6">
         @if (count($items) > 0)
             <div class="flex space-x-6">
+
+                @php
+                    $subtotal = 0;
+                @endphp
+
                 <table class="min-w-[60%] table-auto border border-gray-300 text-sm">
                     <thead class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
                         <tr>
@@ -14,8 +19,16 @@
                     </thead>
                     <tbody>
                         @foreach ($items as $item)
-                            @php $product = $item['product']; @endphp
-                            @include('cart.partials.cards', ['product' => $product, 'item' => $item])
+                            @php 
+                                $product = $item['product']; 
+                                $itemSubtotal = $product->price * $item['quantity'];
+                                $subtotal += $itemSubtotal;
+                            @endphp
+                            @include('cart.partials.cards', [
+                                'product' => $product, 
+                                'item' => $item, 
+                                'itemSubtotal' => $itemSubtotal
+                            ])
                         @endforeach
                     </tbody>
                 </table>
@@ -30,7 +43,7 @@
                         <tbody>
                             <tr class="border-t border-gray-200 dark:border-gray-700">
                                 <td class="px-4 py-2 font-semibold">Subtotal:</td>
-                                <td class="px-4 py-2">{{ number_format($total, 2) }} $</td>
+                                <td class="px-4 py-2">{{ number_format($subtotal, 2) }} $</td>
                             </tr>
                             <tr class="border-t border-gray-200 dark:border-gray-700">
                                 <td class="px-4 py-2 font-semibold">Gastos envío:</td>
@@ -38,7 +51,7 @@
                             </tr>
                             <tr class="border-t border-gray-200 dark:border-gray-700 font-bold">
                                 <td class="px-4 py-3">Total:</td>
-                                <td class="px-4 py-3">{{ number_format($total + $shipping, 2) }} $</td>
+                                <td class="px-4 py-3">{{ number_format($subtotal + $shipping, 2) }} $</td>
                             </tr>
                         </tbody>
                     </table>

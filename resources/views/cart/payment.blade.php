@@ -44,15 +44,15 @@
             <ul class="divide-y divide-gray-200 dark:divide-gray-700">
                 <li class="py-2 flex justify-between text-gray-700 dark:text-gray-200">
                     <span>Subtotal</span>
-                    <span>10,00€</span>
+                    <span>{{ number_format($subtotal, 2) }}€</span>
                 </li>
                 <li class="py-2 flex justify-between font-bold text-gray-700 dark:text-gray-300">
                     <span>Shipping</span>
-                    <span>2,50€</span>
+                    <span>{{ number_format($shipping, 2) }}€</span>
                 </li>
                 <li class="py-2 flex justify-between text-lg font-bold text-gray-900 dark:text-white">
                     <span>Total</span>
-                    <span>12,50€</span>
+                    <span>{{ number_format($total, 2) }}€</span>
                 </li>
             </ul>
         </div>

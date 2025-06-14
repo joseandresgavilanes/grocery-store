@@ -34,18 +34,15 @@ Route::view('/', 'home')->name('home');
 
 // Catálogo público
 Route::get('products',               [ProductController::class,'index'])->name('products.index');
-Route::get('products/{product}', [ProductController::class,'show'])
-     ->whereNumber('product')
-     ->name('products.show');
+Route::get('products/{product}', [ProductController::class,'show'])->name('products.show');
 
 
 // Carrito público (mostrar)
 Route::get('cart',                   [CartController::class,'show'])->name('cart.show');
 
 //llevar a la vista payment
-Route::get('payment', function () {
-    return view('cart.payment');
-})->middleware('auth')->name('payment');
+Route::get('payment', [CartController::class, 'payment'])->middleware('auth')->name('payment');
+
 
 Route::get('edit', function () {
     return view('profile.edit');
@@ -216,3 +213,4 @@ Route::middleware(['auth'])->group(function(){
      ->middleware(['auth','can:view,order'])
      ->name('orders.receipt');
 });
+

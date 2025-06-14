@@ -55,8 +55,9 @@ class ProductController extends Controller
         return view('products.index', compact('products', 'categories'));
     }
 
-    public function show(Product $product): View
+public function show(Product $product)
 {
+    $product->load('category');
     return view('products.show', compact('product'));
 }
 
@@ -104,30 +105,30 @@ class ProductController extends Controller
      * Actualizar producto.
      */
     public function update(ProductFormRequest $request, Product $product): RedirectResponse
-{
-    $this->authorize('update', $product);
+    {
+        $this->authorize('update', $product);
 
-    $data = $request->validated();
+        $data = $request->validated();
 
-    if ($request->hasFile('photo')) {
-        // Generar nombre amigable para la imagen basado en el nombre del producto
-        $filename = Str::slug($data['name']) . '.' . $request->file('photo')->getClientOriginalExtension();
+        if ($request->hasFile('photo')) {
+            // Generar nombre amigable para la imagen basado en el nombre del producto
+            $filename = Str::slug($data['name']) . '.' . $request->file('photo')->getClientOriginalExtension();
 
-        // Guardar la imagen con ese nombre en 'products' dentro del disco 'public'
-        $path = $request->file('photo')->storeAs('products', $filename, 'public');
+            // Guardar la imagen con ese nombre en 'products' dentro del disco 'public'
+            $path = $request->file('photo')->storeAs('products', $filename, 'public');
 
-        // Actualizar el nombre de la foto en los datos para guardar en BD
-        $data['photo'] = $filename;
+            // Actualizar el nombre de la foto en los datos para guardar en BD
+            $data['photo'] = $filename;
 
-        // Opcional: eliminar la imagen anterior si quieres evitar acumulación
-        // Storage::disk('public')->delete("products/{$product->photo}");
+            // Opcional: eliminar la imagen anterior si quieres evitar acumulación
+            // Storage::disk('public')->delete("products/{$product->photo}");
+        }
+
+        $product->update($data);
+
+        return redirect()->route('products.admin')
+                        ->with('success', "Product '{$product->name}' updated.");
     }
-
-    $product->update($data);
-
-    return redirect()->route('products.admin')
-                     ->with('success', "Product '{$product->name}' updated.");
-}
 
     /**
      * Eliminar producto (soft o hard según tu implementación).
