@@ -218,18 +218,5 @@ public function checkout(Request $request): RedirectResponse
                          ->with('success', $msg);
     }
 
-    /**
- * Mostrar la pantalla de checkout con datos dummy.
- */
-public function payment(): \Illuminate\View\View
-{
-    $user = auth()->user();
 
-    // datos de prueba
-    $subtotal = 10.00;
-    $shipping = 2.50;
-    $total    = $subtotal + $shipping;
-
-    return view('cart.payment', compact('user','subtotal','shipping','total'));
-}
 }
