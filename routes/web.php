@@ -34,9 +34,7 @@ Route::view('/', 'home')->name('home');
 
 // Catálogo público
 Route::get('products',               [ProductController::class,'index'])->name('products.index');
-Route::get('products/{product}', [ProductController::class,'show'])
-     ->whereNumber('product')
-     ->name('products.show');
+Route::get('products/{product}', [ProductController::class,'show'])->name('products.show');
 
 
 // Carrito público (mostrar)
@@ -203,3 +201,4 @@ Route::middleware(['auth'])->group(function(){
         Route::get('stats/global', [StatsController::class,'global'])->name('stats.global');
     });
 });
+
