@@ -3,7 +3,7 @@
           {{ $heading ?? ($title ?? 'IP Leiria')}}
     </flux:heading>
     <flux:subheading size="lg" class="mb-6">
-          {{ $subheading ?? 'Department of Computer Engineering' }}
+          {{ $subheading ?? 'Enjoy the experience!' }}
     </flux:subheading>
     <flux:separator variant="subtle" />
 </div>
