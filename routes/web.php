@@ -1,107 +1,41 @@
 <?php
 
-use App\Http\Controllers\CardController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrderItemController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\SettingController;
-use App\Http\Controllers\ShippingCostController;
-use App\Http\Controllers\StockAdjustmentController;
-use App\Http\Controllers\SupplyOrderController;
-use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\{
+    CartController,
+    CardController,
+    OrderController,
+    InventoryController,
+    StockAdjustmentController,
+    SupplyOrderController,
+    UserController,
+    CategoryController,
+    ProductController,
+    SettingController,
+    ShippingCostController,
+    StatsController,
+    CourseController,
+    DisciplineController,
+    DepartmentController
+};
+use App\Models\{Order, Product, SupplyOrder, StockAdjustment, User};
 
-// Ruta pública de bienvenida
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
+// Home
 Route::view('/', 'home')->name('home');
 
-Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+// Catálogo público
+Route::get('products',               [ProductController::class,'index'])->name('products.index');
+Route::get('products/{product}',     [ProductController::class,'show'])->name('products.show');
 
-    Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
-    Volt::route('settings/password', 'settings.password')->name('settings.password');
-    Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
-});
-
-// Dashboard protegido
-
-// — Rutas para socios (member y board) —
-Route::middleware(['auth','can:member'])->group(function(){
-     Route::post('cart/checkout', [CartController::class,'checkout'])->name('cart.checkout');
-     Route::get('card', [CardController::class,'show'])->name('card.show');
-     Route::post('card/topup',[CardController::class,'topup'])->name('card.topup');
-     Route::get('orders/history',[OrderController::class,'history'])->name('orders.history');
-     Route::get('stats/my',[StatsController::class,'myStats'])->name('stats.my');
-   });
-
-   // — Rutas para empleados —
-   Route::middleware(['auth','can:employee'])->group(function(){
-     Route::get('orders/pending',[OrderController::class,'pending'])->name('orders.pending');
-     Route::post('orders/{order}/complete',[OrderController::class,'complete'])->name('orders.complete');
-     Route::resource('inventory',InventoryController::class)->only(['index','update','destroy']);
-     Route::resource('supplies',SupplyOrderController::class)
-           ->only(['index','store','update','destroy']);
-   });
-
-   // — Rutas para administradores (board) —
-   Route::middleware(['auth','can:board'])->group(function(){
-     Route::resource('users',UserAdminController::class);
-     Route::resource('categories',CategoryController::class);
-     Route::resource('products',ProductController::class);
-     Route::resource('settings',SettingsController::class)->only(['index','update']);
-     Route::get('orders/pending',[OrderController::class,'pending'])->name('orders.pending');
-     Route::post('orders/{order}/complete',[OrderController::class,'complete'])->name('orders.complete');
-     Route::post('orders/{order}/cancel',[OrderController::class,'cancel'])->name('orders.cancel');
-     Route::resource('inventory',InventoryController::class)->only(['index','update','destroy']);
-     Route::post('settings/shipping',[ShippingSettingsController::class,'update'])->name('settings.shipping.update');
-     Route::get('stats/global',[StatsController::class,'global'])->name('stats.global');
-   });
-
-
-   Route::middleware(['auth','can:viewAny,App\Models\Product'])->get('inventory', [InventoryController::class,'index'])
-   ->name('inventory.index');
-
-// Ajustes de stock manual
-Route::middleware(['auth','can:create,App\Models\StockAdjustment'])->post('inventory/{product}/adjust',
-   [StockAdjustmentController::class,'store'])
-   ->name('inventory.adjust');
-
-// Órdenes de suministro
-Route::middleware(['auth','can:viewAny,App\Models\SupplyOrder'])->group(function(){
-  Route::get('supply-orders', [SupplyOrderController::class,'index'])
-       ->name('supply-orders.index');
-  Route::get('supply-orders/create', [SupplyOrderController::class,'create'])
-       ->name('supply-orders.create');
-  Route::post('supply-orders', [SupplyOrderController::class,'store'])
-       ->name('supply-orders.store');
-  // Auto-generar órdenes para productos bajo stock_lower_limit
-  Route::post('supply-orders/auto', [SupplyOrderController::class,'autoGenerate'])
-       ->name('supply-orders.auto');
-  // Completar orden (actualiza stock)
-  Route::post('supply-orders/{supplyOrder}/complete', [SupplyOrderController::class,'complete'])
-       ->name('supply-orders.complete');
-  // Eliminar orden
-  Route::delete('supply-orders/{supplyOrder}', [SupplyOrderController::class,'destroy'])
-       ->name('supply-orders.destroy');
-});
-
-Route::get('courses/showcase', [CourseController::class, 'showCase'])->name('courses.showcase');
-
-Route::resource('courses', CourseController::class);
-
-Route::resource('products', ProductController::class);
-
-Route::resource('cards', CardController::class);
-
-Route::resource('disciplines', DisciplineController::class);
-
-Route::resource('departments', DepartmentController::class);
-
-Route::get('cart', [CartController::class, 'show'])->name('cart.show');
+// Carrito público (mostrar)
+Route::get('cart',                   [CartController::class,'show'])->name('cart.show');
 
 // Añadir (o incrementar) items al carrito
 Route::post('cart/{product}', [CartController::class, 'addToCart'])->name('cart.add');
@@ -115,5 +49,132 @@ Route::delete('cart/{product}', [CartController::class, 'removeFromCart'])->name
 // Vaciar carrito completo
 Route::delete('cart', [CartController::class, 'destroy'])->name('cart.destroy');
 
+// Showcase y recursos “extra”
+Route::get('courses/showcase',       [CourseController::class,'showCase'])->name('courses.showcase');
+Route::resource('courses',           CourseController::class);
+Route::resource('disciplines',       DisciplineController::class);
+Route::resource('departments',       DepartmentController::class);
 
-require __DIR__ . '/auth.php';
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
+
+require __DIR__.'/auth.php';
+
+/*
+|--------------------------------------------------------------------------
+| Protected Routes (auth + notBlocked)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function(){
+
+    // Ajustes de perfil / contraseña / apariencia
+    Route::redirect('settings', 'settings/profile');
+    Volt::route('settings/profile',    'settings.profile')->name('settings.profile');
+    Volt::route('settings/password',   'settings.password')->name('settings.password');
+    Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Member & Board Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('can:member')->group(function(){
+        Route::post('cart/checkout',    [CartController::class,'checkout'])->name('cart.checkout');
+        Route::get('card',              [CardController::class,'show'])->name('card.show');
+        Route::post('card/topup',       [CardController::class,'topup'])->name('card.topup');
+        Route::get('orders/history',    [OrderController::class,'history'])->name('orders.history');
+        Route::get('stats/my',          [StatsController::class,'myStats'])->name('stats.my');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Order Handling (Employee & Board)
+    |--------------------------------------------------------------------------
+    */
+    // Ver pendientes
+    Route::middleware('can:viewAny,'.Order::class)
+         ->get('orders/pending', [OrderController::class,'pending'])
+         ->name('orders.pending');
+
+    // Completar (solo employee, policy::complete)
+    Route::middleware('can:complete,order')
+         ->post('orders/{order}/complete', [OrderController::class,'complete'])
+         ->name('orders.complete');
+
+    // Cancelar (solo board, policy::cancel)
+    Route::middleware('can:cancel,order')
+         ->post('orders/{order}/cancel', [OrderController::class,'cancel'])
+         ->name('orders.cancel');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Inventory Management (Employee & Board)
+    |--------------------------------------------------------------------------
+    */
+    // Listar e filtrar inventario
+    Route::middleware('can:viewAny,'.Product::class)
+         ->get('inventory', [InventoryController::class,'index'])
+         ->name('inventory.index');
+
+    // Ajuste manual de stock
+    Route::middleware('can:create,'.StockAdjustment::class)
+         ->post('inventory/{product}/adjust', [StockAdjustmentController::class,'store'])
+         ->name('inventory.adjust');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Supply Orders (Employee & Board)
+    |--------------------------------------------------------------------------
+    */
+    // CRUD básico y auto-generación
+    Route::middleware('can:viewAny,'.SupplyOrder::class)->group(function(){
+        Route::get('supply-orders',            [SupplyOrderController::class,'index'])->name('supply-orders.index');
+        Route::get('supply-orders/create',     [SupplyOrderController::class,'create'])->name('supply-orders.create');
+        Route::post('supply-orders',           [SupplyOrderController::class,'store'])->name('supply-orders.store');
+        Route::post('supply-orders/auto',      [SupplyOrderController::class,'autoGenerate'])->name('supply-orders.auto');
+    });
+
+    // Completar supply order (employee & board)
+    Route::middleware('can:complete,supplyOrder')
+         ->post('supply-orders/{supplyOrder}/complete', [SupplyOrderController::class,'complete'])
+         ->name('supply-orders.complete');
+
+    // Eliminar supply order (solo board)
+    Route::middleware('can:delete,supplyOrder')
+         ->delete('supply-orders/{supplyOrder}', [SupplyOrderController::class,'destroy'])
+         ->name('supply-orders.destroy');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Administration (Board Only)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('can:board')->group(function(){
+        // Gestión de usuarios
+        Route::resource('users', UserController::class)->parameters(['users'=>'user']);
+        Route::post('users/{user}/block',   [UserController::class,'block'])->name('users.block');
+        Route::post('users/{user}/unblock', [UserController::class,'unblock'])->name('users.unblock');
+        Route::post('users/{user}/promote', [UserController::class,'promote'])->name('users.promote');
+        Route::post('users/{user}/demote',  [UserController::class,'demote'])->name('users.demote');
+
+        // Ajustes de negocio
+        Route::resource('categories', CategoryController::class);
+        // Gestión de productos (solo CRUD panel)
+        Route::resource('products', ProductController::class)->except(['index','show']);
+
+        // Ajustes de membresía y envío
+        Route::resource('settings', SettingController::class)->only(['index','update']);
+        Route::post('settings/shipping', [ShippingCostController::class,'update'])
+             ->name('settings.shipping.update');
+
+        // Estadísticas globales
+        Route::get('stats/global', [StatsController::class,'global'])->name('stats.global');
+    });
+});
