@@ -32,7 +32,7 @@ class UserController extends Controller
     {
         $user = User::create($request->validated());
         $url  = route('users.show', ['user' => $user]);
-        $msg  = "Usuario <a href='$url'><u>{$user->name}</u></a> creado correctamente.";
+        $msg = "Usuario <a href='{$url}'><u>" . e($user->name) . "</u></a> creado correctamente.";
         return redirect()->route('users.index')
                          ->with('alert-type', 'success')
                          ->with('alert-msg', $msg);
