@@ -25,12 +25,12 @@ class CardController extends Controller
         $orders     = $user->orders()
                            ->where('status', 'completed')
                            ->orderByDesc('created_at')
-                           ->get();
+                           ->paginate(5);
 
         // Todas las operaciones de la tarjeta: créditos y débitos
         $operations = $card->operations()
                            ->orderByDesc('created_at')
-                           ->get();
+                           ->paginate(5);
 
         return view('cards.show', compact('card', 'orders', 'operations'));
     }
