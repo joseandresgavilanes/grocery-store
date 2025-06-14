@@ -64,4 +64,9 @@ class Product extends Model
         }
         return null;
     }
+
+        public function supplyOrders()
+    {
+        return $this->hasMany(SupplyOrder::class);
+    }
 }
