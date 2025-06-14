@@ -23,7 +23,7 @@ class ProductFormRequest extends FormRequest
             'discount_min_qty'  => 'nullable|integer|min:1',
             'discount'          => 'nullable|numeric|min:0',
             'stock_lower_limit' => 'required|integer|min:0',
-            'stock_upper_limit' => 'required|integer|min:stock_lower_limit',
+            'stock_upper_limit' => 'required|integer|gte:stock_lower_limit',
             'custom'            => 'nullable|array',
         ];
     }
