@@ -32,7 +32,10 @@ Route::view('/', 'home')->name('home');
 
 // Catálogo público
 Route::get('products',               [ProductController::class,'index'])->name('products.index');
-Route::get('products/{product}',     [ProductController::class,'show'])->name('products.show');
+Route::get('products/{product}', [ProductController::class,'show'])
+     ->whereNumber('product')
+     ->name('products.show');
+
 
 // Carrito público (mostrar)
 Route::get('cart',                   [CartController::class,'show'])->name('cart.show');
@@ -177,7 +180,7 @@ Route::middleware(['auth'])->group(function(){
         Route::resource('categories', CategoryController::class);
         // Gestión de productos (solo CRUD panel)
         Route::resource('products', ProductController::class)->except(['index','show']);
-
+        Route::get('products/admin', [ProductController::class,'adminIndex'])->middleware('can:viewAny,'.Product::class)->name('products.admin');
         // Ajustes de membresía y envío
         Route::resource('settings', SettingController::class)->only(['index','update']);
         Route::post('settings/shipping', [ShippingCostController::class,'update'])

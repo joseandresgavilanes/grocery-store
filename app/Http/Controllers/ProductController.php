@@ -54,60 +54,109 @@ class ProductController extends Controller
         return view('products.index', compact('products', 'categories'));
     }
 
+    public function show(Product $product): View
+{
+    return view('products.show', compact('product'));
+}
+
+/**
+     * Formulario de creación.
+     */
     public function create(): View
     {
-        return view('products.create')->with('product', new Product());
+        $this->authorize('create', Product::class);
+        $categories = Category::orderBy('name')->get(['id','name']);
+        return view('products.create', compact('categories'));
     }
 
+    /**
+     * Almacenar nuevo producto.
+     */
     public function store(ProductFormRequest $request): RedirectResponse
     {
-        $p = Product::create($request->validated());
-        $url = route('products.show', ['product' => $p]);
-        $msg = "Producto <a href='$url'><u>{$p->name}</u></a> creado correctamente.";
-        return redirect()->route('products.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
+        $this->authorize('create', Product::class);
 
-    public function show(Product $product): View
-    {
-        return view('products.show', compact('product'));
-    }
-
-    public function edit(Product $product): View
-    {
-        return view('products.edit', compact('product'));
-    }
-
-    public function update(ProductFormRequest $request, Product $product): RedirectResponse
-    {
-        $product->update($request->validated());
-        $url = route('products.show', ['product' => $product]);
-        $msg = "Producto <a href='$url'><u>{$product->name}</u></a> actualizado correctamente.";
-        return redirect()->route('products.index')
-                         ->with('alert-type', 'success')
-                         ->with('alert-msg', $msg);
-    }
-
-    public function destroy(Product $product): RedirectResponse
-    {
-        try {
-            if ($product->orderItems()->count() === 0
-             && $product->supplyOrderItems()->count() === 0) {
-                $product->delete();
-                $type = 'success';
-                $msg  = "Producto {$product->name} eliminado correctamente.";
-            } else {
-                $type = 'warning';
-                $msg  = "El producto {$product->name} no puede borrarse por registros asociados.";
-            }
-        } catch (\Exception $e) {
-            $type = 'danger';
-            $msg  = "Error al eliminar el producto {$product->name}.";
+        $data = $request->validated();
+        if ($file = $request->file('photo')) {
+            $data['photo'] = $file->store('products','public');
         }
 
-        return redirect()->back()
-                         ->with('alert-type', $type)
-                         ->with('alert-msg', $msg);
+        $p = Product::create($data);
+
+        return redirect()->route('products.index')
+                         ->with('success',"Producto '{$p->name}' creado.");
     }
+
+    /**
+     * Formulario de edición.
+     */
+    public function edit(Product $product): View
+    {
+        $this->authorize('update', $product);
+        $categories = Category::orderBy('name')->get(['id','name']);
+        return view('products.edit', compact('product','categories'));
+    }
+
+    /**
+     * Actualizar producto.
+     */
+    public function update(ProductFormRequest $request, Product $product): RedirectResponse
+    {
+        $this->authorize('update', $product);
+
+        $data = $request->validated();
+        if ($file = $request->file('photo')) {
+            // opcional: Storage::disk('public')->delete("products/{$product->photo}");
+            $data['photo'] = $file->store('products','public');
+        }
+
+        $product->update($data);
+
+        return redirect()->route('products.admin')
+                         ->with('success',"Producto '{$product->name}' actualizado.");
+    }
+
+    /**
+     * Eliminar producto (soft o hard según tu implementación).
+     */
+    public function destroy(Product $product): RedirectResponse
+    {
+        $this->authorize('delete', $product);
+
+        if ($product->orderItems()->count() === 0
+         && $product->supplyOrderItems()->count() === 0) {
+            $product->delete();
+            $msg = "Producto '{$product->name}' eliminado.";
+            $type = 'success';
+        } else {
+            $msg = "No se puede eliminar '{$product->name}' por registros asociados.";
+            $type = 'warning';
+        }
+
+        return back()->with('alert-type',$type)
+                     ->with('alert-msg',$msg);
+    }
+
+    public function adminIndex(Request $request): View
+{
+    $this->authorize('viewAny', Product::class);
+
+    $query = Product::with('category');
+
+    if ($request->filled('category_id')) {
+        $query->where('category_id', $request->category_id);
+    }
+    if ($request->filled('q')) {
+        $query->where('name','LIKE',"%{$request->q}%");
+    }
+
+    $products = $query->orderBy('name')
+                      ->paginate(20)
+                      ->appends($request->only(['category_id','q']));
+
+    // Para el filtro de categorías en el dropdown:
+    $categories = Category::orderBy('name')->get(['id','name']);
+
+    return view('products.admin', compact('products','categories'));
+}
 }

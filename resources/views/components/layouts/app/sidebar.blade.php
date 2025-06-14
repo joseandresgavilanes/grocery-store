@@ -111,8 +111,8 @@
                 >Categorías</flux:navlist.item>
                 <flux:navlist.item
                     icon="shopping-bag"
-                    :href="route('products.index')"
-                    :current="request()->routeIs('products.*')"
+                    :href="route('products.admin')"
+                    :current="request()->routeIs('products.admin.*')"
                     wire:navigate
                 >Productos</flux:navlist.item>
                 
