@@ -20,7 +20,7 @@ use App\Policies\SupplyOrderPolicy;
 use App\Policies\StockAdjustmentPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\ProductPolicy;
-use App\Policies\ShippingCostPolicy;
+use App\Policies\SettingsShippingCostsPolicy;
 use App\Policies\SettingsPolicy;
 use App\Policies\CategoryPolicy;
 
@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(StockAdjustment::class, StockAdjustmentPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Category::class,      CategoryPolicy::class);
-        Gate::policy(SettingsShippingCosts::class,  ShippingCostPolicy::class);
+        Gate::policy(SettingsShippingCosts::class,  SettingsShippingCostsPolicy::class);
         Gate::policy(Settings::class, SettingsPolicy::class);
 
         //
