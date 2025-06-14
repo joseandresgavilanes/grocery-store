@@ -30,7 +30,7 @@ class OrderController extends Controller
         $this->authorize('complete', $order);
 
         // 1) Actualizar estado
-        $order->status === 'completed';
+        $order->status ='completed';
         $order->save();
 
         // 2) Generar PDF
@@ -66,7 +66,7 @@ class OrderController extends Controller
         $this->authorize('cancel', $order);
 
         // 1) Cambiar estado
-        $order->status === 'canceled';
+        $order->status = 'canceled';
         $order->save();
 
         // 2) Reembolsar

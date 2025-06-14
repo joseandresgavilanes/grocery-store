@@ -1,51 +1,53 @@
 <x-layouts.main-content title="Pedidos pendientes">
   
-
-  <table class="w-full border-collapse border border-gray-200">
-    <thead class="bg-gray-100">
-      <tr>
-        <th class="p-2 border">#Pedido</th>
-        <th class="p-2 border">Socio</th>
-        <th class="p-2 border">Fecha</th>
-        <th class="p-2 border">Total</th>
-        <th class="p-2 border">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      @forelse($orders as $order)
+  <div class="overflow-x-auto">
+    <table class="min-w-full border border-gray-300 rounded-lg overflow-hidden">
+      <thead class="bg-gray-100">
         <tr>
-          <td class="p-2 border text-center">{{ $order->id }}</td>
-          <td class="p-2 border">{{ $order->member->name }}</td>
-          <td class="p-2 border">{{ $order->created_at->format('Y-m-d') }}</td>
-          <td class="p-2 border text-right">{{ number_format($order->total, 2, ',', '.') }} €</td>
-          <td class="p-2 border flex space-x-2 justify-center">
-            {{-- Botón Completar --}}
-            <form action="{{ route('orders.complete', $order) }}" method="POST">
-              @csrf
-              <button type="submit"
-                      class="btn-success"
-                      {{ $order->items->contains(fn($i)=> $i->quantity > $i->product->stock) ? 'disabled' : '' }}>
-                Completar
-              </button>
-            </form>
-
-            {{-- Botón Cancelar (solo board) --}}
-            @can('cancel', $order)
-              <form action="{{ route('orders.cancel', $order) }}" method="POST">
+          <th class="px-4 py-2 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">#Pedido</th>
+          <th class="px-4 py-2 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Socio</th>
+          <th class="px-4 py-2 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Fecha</th>
+          <th class="px-4 py-2 border-b border-gray-300 text-right text-sm font-semibold text-gray-700">Total</th>
+          <th class="px-4 py-2 border-b border-gray-300 text-center text-sm font-semibold text-gray-700">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($orders as $order)
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 border-b border-gray-200 text-gray-800 text-sm text-center">{{ $order->id }}</td>
+            <td class="px-4 py-3 border-b border-gray-200 text-gray-800 text-sm">{{ $order->member->name }}</td>
+            <td class="px-4 py-3 border-b border-gray-200 text-gray-800 text-sm">{{ $order->created_at->format('Y-m-d') }}</td>
+            <td class="px-4 py-3 border-b border-gray-200 text-gray-800 text-sm text-right">{{ number_format($order->total, 2, ',', '.') }} €</td>
+            <td class="px-4 py-3 border-b border-gray-200 text-center space-x-2 flex justify-center">
+              {{-- Botón Completar --}}
+              <form action="{{ route('orders.complete', $order) }}" method="POST" class="inline">
                 @csrf
-                <button type="submit" class="btn-warning">
-                  Cancelar
+                <button type="submit"
+                        class="px-3 py-1 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:bg-green-300 disabled:cursor-not-allowed transition"
+                        {{ $order->items->contains(fn($i)=> $i->quantity > $i->product->stock) ? 'disabled' : '' }}>
+                  Completar
                 </button>
               </form>
-            @endcan
-          </td>
-        </tr>
-      @empty
-        <tr>
-          <td colspan="5" class="p-4 text-center text-gray-500">No hay pedidos pendientes.</td>
-        </tr>
-      @endforelse
-    </tbody>
-  </table>
-  
+
+              {{-- Botón Cancelar (solo board) --}}
+              @can('cancel', $order)
+                <form action="{{ route('orders.cancel', $order) }}" method="POST" class="inline">
+                  @csrf
+                  <button type="submit"
+                          class="px-3 py-1 rounded-md bg-yellow-500 text-white text-sm font-medium hover:bg-yellow-600 transition">
+                    Cancelar
+                  </button>
+                </form>
+              @endcan
+            </td>
+          </tr>
+        @empty
+          <tr>
+            <td colspan="5" class="p-6 text-center text-gray-500 italic">No hay pedidos pendientes.</td>
+          </tr>
+        @endforelse
+      </tbody>
+    </table>
+  </div>
+
 </x-layouts.main-content>
