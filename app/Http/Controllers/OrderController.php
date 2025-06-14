@@ -8,22 +8,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderCompleted;
-use PDF;
 use App\Models\StockAdjustment;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
 
-    public function receipt(Order $order)
+public function receipt(Order $order)
 {
-    $this->authorize('view', $order);
-    $path = "public/receipts/order-{$order->id}.pdf";
+    $this->authorize('view', $order); // Lo mantenemos para seguridad
 
-    if (!\Storage::exists($path)) {
-        abort(404);
-    }
+    $pdf = Pdf::loadView('pdf.receipt', compact('order'));
 
-    return \Storage::download($path, "recibo-pedido-{$order->id}.pdf");
+    return $pdf->download("recibo-pedido-{$order->id}.pdf");
 }
 
     public function pending()
